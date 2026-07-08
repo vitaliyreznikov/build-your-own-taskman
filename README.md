@@ -13,32 +13,31 @@ The spec is the product. Code is a disposable view of it.
 
 ## Why this exists
 
-I spent a month running a dozen AI agents at once. The bottleneck was never the
-code they wrote — it was my attention. Normal task managers are built for a human
-clicking around; I needed one built for **pointing agents at work and reviewing
-what comes back**. So I built it, and now I'm publishing it the way I think apps
-should be published in the AI era: as a spec you can regenerate.
+For the last few months I've been running a dozen AI agents at the same time. The
+bottleneck was never the code they wrote — it was my attention. Normal task
+managers are built for a human clicking around; I needed one built for **assigning
+work to agents and reviewing what comes back**. So I designed one.
 
-There are roughly three camps in the AI-tooling debate:
+LLMs are a fantastic tool and they still make mistakes, so every step toward a
+production-grade system still needs human understanding, judgment, and review. The
+win isn't automating the human away — it's redesigning the workflow so **one human
+can run and review many agents in parallel**. That is the real harness, and this
+app is a cockpit for it.
 
-- **AI conservatives** — LLMs make too many mistakes; keep humans doing the work.
-- **Harness maximalists** — with the right scaffolding the LLM does everything,
-  no human needed.
-- **Human-in-the-loop (this repo's camp)** — LLMs are a great tool that still make
-  mistakes, so every step toward a production-grade system must be reviewed by a
-  person. The leverage isn't removing the human — it's changing your *workflow* so
-  one human can run and review **many agents in parallel**. That workflow is the
-  real harness. This app is a cockpit for it.
-
-Two ideas in the app are worth calling out (both marked `novel: true` in the
-feature files):
+Two ideas turned out to matter most (both marked `novel: true` in the feature
+files):
 
 1. **Tasks are plain Markdown files.** No database. The task file *is* the prompt.
 2. **A terminal runs inside the task app.** The agent works where the task lives —
    and that single decision is what unlocks the whole live-status supervision layer.
 
-This isn't a hypothetical template. Every feature and every dependency edge is
-extracted from the real, running app.
+**What this repo is (and isn't).** I'm not publishing the implementation. It was
+an internal tool I built for myself — I haven't read a single line of it, which is
+exactly the point: internal automation and production code are not the same bar.
+What I *am* publishing is the part I trust and think is reusable — the **system
+design**: a feature menu, a dependency graph, and prompts you can hand to an LLM
+to build your own. Every feature and every dependency edge is extracted from the
+real, running app.
 
 ---
 
