@@ -38,10 +38,32 @@ report per-task, per-terminal status back onto the board.
   live session (repaint), and shall not display a stale session after switching
   tasks.
 
+## Tools / libraries (the concrete stack)
+The terminal is the one feature where the specific tools matter — here's exactly
+what the reference app uses. Substitute equivalents if your stack differs, but
+this combination is what makes persistence + reattach work:
+
+- **`@xterm/xterm`** — the terminal emulator rendered in the app (renderer process).
+- **`@xterm/addon-fit`** — resizes the xterm grid to the container on layout change.
+- **`node-pty`** — spawns a pseudo-terminal from the Electron **main** process.
+  Native module: rebuild it against Electron (`electron-rebuild -f -w node-pty`)
+  in a postinstall step, or it won't load.
+- **`tmux`** — the persistence layer. **node-pty does not spawn your shell
+  directly — it spawns `tmux`**, one session per terminal, each on a *dedicated
+  tmux socket*. That's the whole trick: the shell + running agent live in tmux, so
+  closing/reopening the view or restarting the app just re-attaches to the same
+  session. Scrollback lives in tmux (mouse wheel → copy-mode), so keep xterm's own
+  scrollback small.
+- **IPC** (Electron `ipcMain`/`ipcRenderer` + preload) pipes pty output → renderer
+  and keystrokes → pty.
+
 ## Build notes
-- Architecture: renderer holds the `xterm.js` view; the Electron main process owns
-  a pty manager that spawns/attaches tmux and pipes data over IPC. Keep the pty
-  lifecycle in main so it survives renderer reloads.
+- Architecture: renderer holds the `@xterm/xterm` view; the Electron main process
+  owns a pty manager that spawns/attaches tmux via `node-pty` and pipes data over
+  IPC. Keep the pty lifecycle in main so it survives renderer reloads.
+- Keep xterm instances in a **module-level registry keyed by session** so they
+  survive React remounts — don't recreate the Terminal on every render, or you
+  lose scrollback and the attach.
 - Real edge cases the reference implementation hit (honor these):
   - **Repaint on re-attach:** when a fresh xterm re-attaches to an existing tmux
     session, force a repaint or the pane renders blank.
