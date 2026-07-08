@@ -1,0 +1,23 @@
+# build-your-own-taskman
+
+> A personal task manager published as a spec, not as code. It's a menu of
+> features with a cross-feature dependency graph; select a subset, resolve
+> prerequisites, and have an LLM build your own version. Two novel ideas: tasks
+> are plain Markdown files (no DB), and a terminal runs inside the task app
+> (which enables a live multi-agent supervision layer).
+
+## Start here
+- [README](README.md): what this is, the human-in-the-loop thesis, 4-step usage
+- [MENU](MENU.md): the à-la-carte feature list (9 epics), tick what you want
+- [DEPENDENCIES](DEPENDENCIES.md): the graph + machine-readable adjacency list
+- [PROFILES](PROFILES.md): ready-made bundles (Minimal / Solo-agent / Cockpit)
+
+## Prompts (the build pipeline)
+- [00-resolve](prompts/00-resolve.md): close prerequisites, emit build order
+- [01-build](prompts/01-build.md): the build runbook / constitution
+- [02-verify](prompts/02-verify.md): acceptance-criteria self-check
+
+## Features
+One spec file per feature under features/. IDs are <Epic><NN> (e.g. A01, F01).
+Each has: What, Why it exists, EARS acceptance criteria, Build notes.
+Novel ideas: features/A01-task-as-markdown.md, features/F01-terminal-inside-app.md
