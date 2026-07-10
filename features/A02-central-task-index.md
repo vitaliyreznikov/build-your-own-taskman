@@ -29,6 +29,10 @@ model.
 ## Acceptance criteria (EARS)
 - When a task is created, the system shall append a row to `tasks.md` with its
   `id` and `title` and defaults for the remaining fields.
+- When it writes that new row, the system shall re-read `tasks.md` immediately
+  before writing and merge the new row into the current on-disk rows, rather than
+  rewriting the file from a stale in-memory snapshot — so a row an external agent
+  appended after the app last read is preserved, not overwritten.
 - When a task's column, priority, project, parent, board, or NextAction changes,
   the system shall update that task's row in `tasks.md`.
 - When the board renders, the system shall derive the set of tasks and their
@@ -46,5 +50,10 @@ model.
   per-task child boards in the later boards/views epic.
 - Always write through the atomic writer (A06) so a crash mid-write can't corrupt
   the whole project index.
+- The whole-file rewrite is convenient but means a create/update must read-merge-
+  write against the *latest* on-disk content, not a snapshot held from earlier in
+  the session; otherwise the app silently drops rows other writers (agents editing
+  `tasks.md` directly) added in the meantime. Atomic write (A06) prevents torn
+  files; the read-merge-write is what prevents lost updates.
 - Deliberately keep it a *table*, not per-note frontmatter: one file to scan, one
   file to diff, trivial for an agent to rewrite.
