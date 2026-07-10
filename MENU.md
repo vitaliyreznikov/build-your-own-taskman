@@ -97,3 +97,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 
 - [ ] **I01** Per-task Claude session history (`.claude-sessions.json`) — M — requires F02, H03
 - [ ] **I02** Resume a past session in a new terminal — M — requires I01
+
+## Epic J — Claude account usage
+
+- [ ] **J01** Claude usage-limit widget (5h + weekly, pace-relative) — M — requires B01 — [spec](features/J01-claude-usage-limit-widget.md)
