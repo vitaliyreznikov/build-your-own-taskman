@@ -20,6 +20,8 @@ graph TD
   F --> I[I · Session history]
   H --> I
   B --> J[J · Claude account usage]
+  E --> K[K · Scheduled autorun]
+  F --> K
 ```
 
 **Read it as:** A is the ground floor (everything needs it). B is the UI on top.
@@ -95,6 +97,7 @@ H10: H04
 I01: F02, H03
 I02: I01
 J01: B01
+K01: E01, E03, F09, F12
 ```
 
 ## Build-order guarantee
