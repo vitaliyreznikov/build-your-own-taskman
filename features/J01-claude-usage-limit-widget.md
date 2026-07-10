@@ -50,12 +50,16 @@ rate-of-consumption signal so you can throttle before you hit a wall.
 - The system shall display, for each window, a countdown to when the window resets.
 - When a window is fully consumed, the system shall indicate the limit is reached
   rather than showing a misleading delta.
-- The system shall refresh the underlying usage figures on a periodic schedule and
-  shall re-render the countdown and pace delta continuously between refreshes
-  without issuing a network request for each tick.
+- The system shall re-render the countdown and pace delta continuously without
+  issuing a network request for each tick.
+- The system shall refresh the underlying usage figures in response to user
+  activity once the figures exceed a staleness age, and shall not issue network
+  requests while the app is idle/unattended.
+- When the figures are stale (no recent activity has refreshed them), the system
+  shall visually mark them as stale and offer a manual refresh control.
 - When usage data cannot be fetched (no credentials, network error, expired token),
-  the system shall show an unobtrusive unavailable/error state rather than stale
-  numbers presented as current.
+  the system shall show an unobtrusive unavailable/error state — never stale numbers
+  presented as current — and shall offer a manual refresh control.
 
 ## Build notes
 - Source of truth is Claude Code's own usage endpoint —
@@ -70,11 +74,17 @@ rate-of-consumption signal so you can throttle before you hit a wall.
   (JSON → `.claudeAiOauth.accessToken`). The widget reads it fresh each poll rather
   than caching it, since Claude Code rotates it. Token access is a
   main-process/back-end concern, never the renderer.
-- Split the two update rates: poll the network infrequently (the utilization only
-  moves when the account actually makes requests — ~60s is ample), but recompute the
+- Split the two update rates, and make the network side activity-gated rather than
+  a blind timer: the utilization only moves when the account actually makes
+  requests, and an unattended app should make no requests at all. Track user
+  activity (pointer/keyboard/focus/visibility) and trigger a refresh only once the
+  cached figures pass a staleness age (~2 min). Independently, recompute the
   countdown and pace delta on a fast local tick (~1s) from the cached `resets_at`
-  plus the fixed window length (5h / 7d). Elapsed-time percent =
-  `(now − (resets_at − windowLength)) / windowLength`, clamped to 0–100.
+  plus the fixed window length (5h / 7d) — no network per tick. Elapsed-time
+  percent = `(now − (resets_at − windowLength)) / windowLength`, clamped to 0–100.
+- Staleness is simply "older than the refresh age", which — because activity
+  refreshes it — also means "no recent activity". Surface it as a dimmed state plus
+  a manual refresh button so a returning user can force an immediate update.
 - The pace delta is the novel bit: it is a *derived* comparison of two percentages
   (time vs. quota), not anything the API returns. Keep the sign convention in one
   place so the UI and any thresholds agree.
