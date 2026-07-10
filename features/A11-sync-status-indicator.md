@@ -21,7 +21,10 @@ indicator turns the silent background engine into something trustworthy at a
 glance.
 
 ## Acceptance criteria (EARS)
-- The system shall display the time or relative age of the last successful sync.
+- When a sync succeeded recently, the system shall hide the indicator to save
+  sidebar space (a fresh successful sync is the uninteresting case).
+- When the last successful sync is older than a threshold, the system shall display
+  its time or relative age (a stale sync is the actionable case worth surfacing).
 - While a sync is running, the system shall show an in-progress state.
 - When a sync fails, the system shall show an error state distinct from the idle
   and in-progress states.

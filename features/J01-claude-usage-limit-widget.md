@@ -8,14 +8,24 @@ novel: false
 ---
 
 ## What
-A small always-visible widget in the left sidebar that shows the state of the
-signed-in Claude account's two rolling usage limits — the **5-hour session** limit
-and the **7-day (weekly)** limit. For each window it shows three things on one line:
+A small widget at the top of the left sidebar (above the View section) that shows
+the state of the signed-in Claude account's rolling usage limits — the **5-hour
+session** limit, the **7-day (weekly)** limit, and the **per-model weekly cap**
+(e.g. Fable). Each window is shown on two stacked lines (so the narrow sidebar
+never scrolls horizontally): a first line with used %, pace delta, and a second
+line with the reset countdown:
 
 ```
-5h:  34% +3%  · resets in 2h10m
-1wk:  8% −4%  · resets in 4d 6h
+5h    9% +6%
+resets in 4h14m
+1wk   2% +29%
+resets in 4d 20h
+Fable 0% idle
 ```
+
+A per-model weekly window whose reset time is null (the model hasn't been used
+this week) shows just its percent and an `idle` marker — no delta or countdown,
+since there is no active window clock to measure against.
 
 - **used %** — how much of the window's quota is consumed (from the API's
   `utilization`, 0–1, rendered as a percent).
@@ -39,8 +49,11 @@ you're running slightly hot. The pace delta turns a static gauge into a
 rate-of-consumption signal so you can throttle before you hit a wall.
 
 ## Acceptance criteria (EARS)
-- The system shall display, for both the 5-hour and the 7-day window, the percent
-  of the limit consumed.
+- The system shall display, for the 5-hour, the 7-day, and the per-model weekly
+  window, the percent of the limit consumed.
+- Where a window has no active reset time (e.g. a per-model cap the account hasn't
+  touched this week), the system shall show its percent only, without a pace delta
+  or countdown.
 - The system shall display, for each window, a pace delta computed as the window's
   elapsed-time percent minus its consumed percent, signed so that a positive value
   means consumption is behind the time-pace (headroom) and a negative value means
@@ -72,6 +85,9 @@ rate-of-consumption signal so you can throttle before you hit a wall.
   exceed 100 for an over-limit account with extra usage. Normalize it once at the
   boundary. There is **no CLI subcommand** for this; the HTTP call is the only
   interface.
+- The per-model weekly cap comes from the response's `limits[]` array — the entry
+  with `kind: "weekly_scoped"` whose `scope.model.display_name` matches the model
+  (e.g. "Fable"), carrying `percent` and a possibly-null `resets_at`.
 - The OAuth access token is whatever the local Claude Code install already holds —
   on macOS it lives in the login Keychain under service `Claude Code-credentials`
   (JSON → `.claudeAiOauth.accessToken`). The widget reads it fresh each poll rather
