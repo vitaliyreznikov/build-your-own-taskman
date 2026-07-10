@@ -22,6 +22,9 @@ graph TD
   B --> J[J · Claude account usage]
   E --> K[K · Scheduled autorun]
   F --> K
+  F --> L[L · PR-review blocking]
+  E --> L
+  H --> L
 ```
 
 **Read it as:** A is the ground floor (everything needs it). B is the UI on top.
@@ -98,6 +101,7 @@ I01: F02, H03
 I02: I01
 J01: B01
 K01: E01, E03, F09, F12
+L01: F12, E01, H07
 ```
 
 ## Build-order guarantee
