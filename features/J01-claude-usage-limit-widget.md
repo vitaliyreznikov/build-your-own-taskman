@@ -16,19 +16,20 @@ never scrolls horizontally): a first line with used %, pace delta, and a second
 line with the reset countdown:
 
 ```
-5h    9% +6%
+5h    91% +6%
 resets in 4h14m
-1wk   2% +29%
+1wk   98% +29%
 resets in 4d 20h
-Fable 0% idle
+Fable 100% idle
 ```
 
 A per-model weekly window whose reset time is null (the model hasn't been used
 this week) shows just its percent and an `idle` marker — no delta or countdown,
 since there is no active window clock to measure against.
 
-- **used %** — how much of the window's quota is consumed (from the API's
-  `utilization`, 0–1, rendered as a percent).
+- **remaining %** — how much of the window's quota is left (`100 − used`, where
+  used comes from the API's `utilization`). This matches Claude Code's own
+  statusline convention, where `5h:92%` means 92% remaining.
 - **pace delta** — `time_elapsed% − used%`, i.e. how the consumption compares to
   where an even, linear burn would have you at this point in the window.
   - **`+` (positive)** means you are *behind* the clock — using slower than time is
@@ -50,7 +51,8 @@ rate-of-consumption signal so you can throttle before you hit a wall.
 
 ## Acceptance criteria (EARS)
 - The system shall display, for the 5-hour, the 7-day, and the per-model weekly
-  window, the percent of the limit consumed.
+  window, the percent of the limit remaining (`100 − used`), matching Claude
+  Code's statusline convention.
 - Where a window has no active reset time (e.g. a per-model cap the account hasn't
   touched this week), the system shall show its percent only, without a pace delta
   or countdown.
