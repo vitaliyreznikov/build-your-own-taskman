@@ -66,8 +66,11 @@ rate-of-consumption signal so you can throttle before you hit a wall.
   `GET https://api.anthropic.com/api/oauth/usage` with
   `Authorization: Bearer <accessToken>` and header
   `anthropic-beta: oauth-2025-04-20`. The response carries `five_hour` and
-  `seven_day` objects, each with `utilization` (0–1) and `resets_at` (ISO
-  timestamp). There is **no CLI subcommand** for this; the HTTP call is the only
+  `seven_day` objects, each with `utilization` and `resets_at` (ISO timestamp).
+  **`utilization` is a percentage on a 0–100 scale** (e.g. `6.0` == 6% used, and
+  it matches the corresponding `limits[].percent`), *not* a 0–1 fraction — it can
+  exceed 100 for an over-limit account with extra usage. Normalize it once at the
+  boundary. There is **no CLI subcommand** for this; the HTTP call is the only
   interface.
 - The OAuth access token is whatever the local Claude Code install already holds —
   on macOS it lives in the login Keychain under service `Claude Code-credentials`
