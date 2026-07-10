@@ -12,8 +12,8 @@ A small widget at the top of the left sidebar (above the View section) that show
 the state of the signed-in Claude account's rolling usage limits — the **5-hour
 session** limit, the **7-day (weekly)** limit, and the **per-model weekly cap**
 (e.g. Fable). Each window is shown on two stacked lines (so the narrow sidebar
-never scrolls horizontally): a first line with used %, pace delta, and a second
-line with the reset countdown:
+never scrolls horizontally): a first line with remaining %, pace delta, and a
+second line with the reset countdown:
 
 ```
 5h    91% +6%
