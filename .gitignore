@@ -1,2 +1,14 @@
 .DS_Store
 node_modules/
+
+# Private feature specs — kept LOCAL, never pushed to the public repo.
+# Convention: put the word "private" anywhere in the filename and it stays
+# untracked. Use for personal/unofficial-API features that don't belong in the
+# published spec set. These must be self-contained (do NOT add rows for them to
+# the tracked MENU.md / DEPENDENCIES.md, or the name would leak). Track them in
+# the gitignored MENU.private.md / DEPENDENCIES.private.md instead.
+*private*.md
+features/*private*.md
+prompts/*private*.md
+MENU.private.md
+DEPENDENCIES.private.md
