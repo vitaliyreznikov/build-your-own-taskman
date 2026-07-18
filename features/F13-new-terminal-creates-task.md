@@ -1,70 +1,87 @@
 ---
 id: F13
 epic: F — In-app terminals
-title: "+" new-terminal button spawns a task-creating agent
+title: "+" new-terminal button reserves a task id and spawns an agent to fill+solve it
 size: M
-requires: [F06, F12, A07]
+requires: [F06, F12, F09, A07]
 novel: true
 ---
 
 ## What
-The "+" button in the terminal tab bar no longer opens a bare shell. Instead it
-opens a fresh terminal, auto-starts the coding agent (the F12 machinery), and
-seeds it with a **create-a-new-task prompt** rather than a work-on-task prompt.
-The agent interviews the user for a few details, distills a clear title and short
-description, then *creates the task* — allocating the next free `I<N>` id (A07),
-adding its row to the central index (`tasks.md`), and writing the `I<N>.md` note
-— following the repo's agent guide (`AGENTS.md`). It then immediately begins
-working on the task it just created, in the same session.
+The "+" button in the terminal tab bar no longer opens a bare shell. Clicking it:
 
-Because there is no task yet, this path is the one auto-start case that is *not*
-gated on a `taskId`: the terminal is a plain `term-<n>` session with no
-`TASKS_TASK_ID`. The seed prompt also restates the status-marker contract so the
-supervision layer (H03/H04) can drive the tab/card icon once the agent starts the
-work.
+1. **Reserves a task id up front** — allocates the next free `I<N>` (A07) and
+   creates a *placeholder* task (index row + note file, title `New task…`). This
+   is what "reserves" the id: because allocation unions `tasks.md` rows and note
+   files, a committed placeholder guarantees no later allocation reuses `I<N>`.
+2. **Opens a task-linked terminal named for that id** (`task-I<N>`), so the tab
+   reads **`I<N>` from the start** and never has to be renamed once the real task
+   lands. Being a task terminal, it exports `TASKS_TASK_ID` (F02) and joins the
+   IN PROGRESS board on open (F09) like any other task terminal.
+3. **Auto-starts the agent with a create-and-solve prompt** (built on F12) that
+   *names the reserved id*: the agent interviews the user for a title and short
+   description, fills the placeholder in (real title in `tasks.md`, contents in
+   `I<N>.md`) per `AGENTS.md`, then immediately starts working on it — all in the
+   one session. The prompt also restates the status-marker contract so the
+   supervision layer (H03/H04) drives the tab/card icon while the work runs.
+
+The tab title concern ("how will it update when the task is created?") is
+designed away: the id is fixed before the terminal exists, so the tab is correct
+from frame one. Only the *card* title changes, when the agent replaces the
+`New task…` placeholder.
 
 ### The exact prompt (from the reference implementation)
 After typing `claude` and waiting until it looks ready, the app types this
-verbatim:
+verbatim (`<N>` is the reserved id):
 
 ```
-The user wants to create a new task in TaskMan (this repo) and start solving it at the same time. Ask them for a few details — enough to identify a clear title and a short description — then create the task (allocate the next free I<N> id, add its row to tasks.md, write the I<N>.md note) following the conventions in AGENTS.md, and immediately begin working on it in this same session. Report status inside your answers: when your phase changes add a line "🤖 working: <what you're doing>", and end every turn's final message with one marker line — "✅ done: <one-line summary>", "⏳ waiting: <external process: job, CI, review — never waiting on me>" or "⚠️ attention: <anything you need from me>" (a question = attention, not done).
+Task I<N> was just created in TaskMan (this repo) as a placeholder and this terminal is linked to it. Ask the user for a few details — enough for a clear title and a short description — then fill the task in: set its title in tasks.md and write its I<N>.md note, following the conventions in AGENTS.md. Then immediately start working on it in this same session. Report status inside your answers: when your phase changes add a line "🤖 working: <what you're doing>", and end every turn's final message with one marker line — "✅ done: <one-line summary>", "⏳ waiting: <external process: job, CI, review — never waiting on me>" or "⚠️ attention: <anything you need from me>" (a question = attention, not done).
 ```
 
 ## Why it exists
 Capturing a new task and starting on it were two separate motions: hit a quick-add
 bar (B04) to file the task, then open its terminal (F12) to point an agent at it.
-For the common "I just thought of something and want to act on it now" case, the
-"+" button — already the most reachable control on the terminal view — collapses
-both into one gesture. The agent both *files* the work (so it exists on the board
-with a real id and note) and *starts* it, so the human goes from an idea to an
-agent mid-task in a single click, without hand-typing `claude` or a prompt.
+The "+" button — already the most reachable control on the terminal view —
+collapses both into one gesture. Reserving the id *before* launching the agent is
+what makes it clean: the terminal is a first-class task terminal immediately
+(stable tab label, `TASKS_TASK_ID`, board membership, per-terminal status keying),
+instead of a nameless `term-<n>` that would have to be re-identified after the
+agent got around to creating the task.
 
 ## Acceptance criteria (EARS)
-- When the user clicks the new-terminal ("+") button, the system shall open a new
-  non-task terminal, launch the agent CLI, and type the create-a-new-task prompt.
-- The create-a-new-task prompt shall instruct the agent to elicit a title and
-  description, allocate the next free task id, write the index row and the note
-  file per the agent guide, and then start working on the created task.
-- The create-a-new-task prompt shall restate the status-marker contract so the
-  agent emits the markers the supervision layer reads.
+- When the user clicks the new-terminal ("+") button, the system shall reserve the
+  next free task id by creating a placeholder task (index row + note) before
+  opening the terminal.
+- The system shall open a task-linked terminal named for the reserved id so its
+  tab shows `I<N>` from the moment it appears, with no later rename.
+- When the terminal opens, the system shall auto-start the agent and type a prompt
+  that names the reserved id and instructs the agent to elicit a title and
+  description, fill the placeholder in per the agent guide, then start solving it.
+- The prompt shall restate the status-marker contract so the agent emits the
+  markers the supervision layer reads.
+- The reserved id shall not be handed out to any subsequent allocation, even
+  before the agent has written the real title/note.
 - While auto-start's readiness/timeout handling (F12) shall apply unchanged, the
-  create-task path shall fire even though the terminal has no linked task id.
-- When the agent CLI does not report ready within the bounded timeout, the system
-  shall type the create-a-new-task prompt anyway rather than hang.
+  create-task prompt shall be selected (instead of the plain work-on-task prompt)
+  for a terminal opened via this button.
 
 ## Build notes
-- Reuse the F12 auto-start plumbing: the only additions are (a) a `createTask`
-  option on the terminal-open request, (b) relaxing the auto-start gate so it
-  fires on `autoClaude || resume` when `taskId || createTask` (previously
-  `taskId` was mandatory), and (c) selecting the create-task prompt instead of the
-  work-on-task prompt when `createTask` is set and there is no task id.
-- The button's own click handler is the only caller that sets `createTask`; every
-  other auto-start path still passes a `taskId` and gets the work-on-task prompt.
-- Id allocation, the index row, and the note file are produced *by the agent*
-  following `AGENTS.md`, not by app code — keep the mechanics in the guide (A07)
-  so the one source of truth stays the guide the agent reads.
-- Since the terminal starts with no `taskId`, it does not join the IN PROGRESS
-  board on open (F09); board membership follows once the agent has created the
-  task and, if configured, opens/keeps a task-linked terminal for it.
+- Reservation reuses the normal task-create path (allocate id → write `tasks.md`
+  row → `ensureNote` → order), so no new persistence format is introduced; the
+  placeholder is just a task whose title the agent overwrites. Because id
+  allocation already unions rows *and* note files (A07), a committed placeholder
+  is a durable reservation.
+- The only additions over F12 are: (a) a `createTask` flag on the terminal-open
+  request, (b) relaxing the auto-start gate to fire on `autoClaude || resume` when
+  `taskId || createTask` (it previously required a `taskId`), and (c) selecting
+  the create-task prompt — which still references the (now reserved) `taskId` — in
+  place of the work-on-task prompt.
+- The button handler is the only caller that sets `createTask`; every other
+  auto-start path passes a `taskId` and gets the work-on-task prompt unchanged.
+- Creating the placeholder is a self-write, so suppress the file-watcher echo
+  (no "changed on disk" banner) and refresh the board locally so the new card
+  appears at once.
 - Keep the seeded status-marker text in sync with the agent guide, same as F12.
+- Tradeoff: clicking "+" and then abandoning leaves a `New task…` placeholder on
+  the board. That is the intended "create it at the same time" semantics; the
+  agent renames it within its first turn.

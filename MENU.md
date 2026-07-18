@@ -74,7 +74,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **F10** Single-instance lock + guard closing a tab while an agent runs — M — requires F04
 - [ ] **F11** Terminal-state tally in sidebar — S — requires F04, H*
 - [ ] **F12** Auto-start Claude with the work-on-task prompt — M — requires F02 — [spec](features/F12-auto-start-claude-with-prompt.md)
-- [ ] **F13** "+" new-terminal button spawns a task-creating agent — M — requires F06, F12, A07 — [spec](features/F13-new-terminal-creates-task.md)
+- [ ] **F13** "+" reserves a task id and spawns an agent to fill+solve it — M — requires F06, F12, F09, A07 — [spec](features/F13-new-terminal-creates-task.md)
 
 ## Epic G — Prompt-parts library
 
