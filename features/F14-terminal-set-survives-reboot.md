@@ -21,8 +21,10 @@ Two halves:
 
 1. **Auto-saved snapshot.** The app continuously records the current terminal set
    to a machine-local `.terminals.json`: for each session its name, task id,
-   working directory, left-to-right position, and the id of the most recent Claude
-   session for that task. It is written on every change that matters (a terminal
+   working directory, left-to-right position, and the Claude session a restore
+   should resume (its id *and* the directory it ran in). This file is also the
+   single home of the **tab order** — one file describes the terminal set
+   completely, so nothing can restore the tabs but lose their arrangement. It is written on every change that matters (a terminal
    opened, a tab closed, tabs reordered), on a slow heartbeat while terminals are
    open, and on app quit / system shutdown. The user never has to remember to save
    — a kernel panic at 3am must not cost the day's terminals.
@@ -65,8 +67,16 @@ turns "don't reboot, you'll lose the terminals" into a button.
 ## Acceptance criteria (EARS)
 - The system shall maintain a machine-local snapshot of the open terminals holding,
   per terminal, its session name, task id (when it is a task terminal), working
-  directory, left-to-right position, and the most recent recorded Claude session id
-  for its task.
+  directory, left-to-right position, and the Claude session a restore should resume.
+- The snapshot shall be the single source of the terminal tab order, and the app
+  shall order the tabs by it on startup.
+- Because agent session history is keyed by working directory, the system shall
+  record the directory the resumable session ran in, and shall start a restored
+  terminal in that directory so the resume finds the conversation.
+- Where the directory a recorded session ran in no longer exists, the system shall
+  not offer that session for resume, and where a restore target directory has
+  disappeared it shall fall back to the data root rather than fail to open the
+  terminal.
 - The system shall update the snapshot when a terminal is opened, when a tab is
   closed, and when tabs are reordered, without any user action.
 - While terminals are open, the system shall refresh the snapshot periodically so
@@ -105,6 +115,22 @@ owns only the *order* (it holds the tab array), so the save IPC takes an order a
 and the main process derives everything else. Main caches the last order it was
 given so it can still save on `will-quit` / `powerMonitor('shutdown')`, when no
 renderer round-trip is possible.
+
+### Picking what to resume
+A task accumulates sessions from several directories (the data root, a worktree, a
+temp scratchpad), and Claude keys its history by cwd
+(`~/.claude/projects/<slugified-cwd>`) — so `claude --resume <id>` silently finds
+nothing when the terminal starts elsewhere. Prefer the newest session whose cwd is
+the pane's current cwd (resume works *and* the terminal returns to where it was);
+otherwise the newest session whose directory still exists; otherwise no resume at
+all. Never offer a session from a directory that is gone — a deleted worktree or a
+wiped `/private/tmp` scratchpad would make the restore fail outright.
+
+### Tab order
+Order used to live in renderer localStorage, written on drag-reorder. It moves into
+the snapshot: reordering saves the snapshot, and startup reads the snapshot before
+seeding the tabs (a late-arriving order would leave the first render mis-ordered).
+The old localStorage key is read once as a migration seed and never written again.
 
 ### Restore path
 Reuse `terminal:open` — it already accepts an explicit session `name` and a
