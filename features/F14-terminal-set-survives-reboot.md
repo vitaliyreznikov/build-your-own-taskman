@@ -24,9 +24,11 @@ Two halves:
    working directory, left-to-right position, and the Claude session a restore
    should resume (its id *and* the directory it ran in). This file is also the
    single home of the **tab order** — one file describes the terminal set
-   completely, so nothing can restore the tabs but lose their arrangement. It is written on every change that matters (a terminal
-   opened, a tab closed, tabs reordered), on a slow heartbeat while terminals are
-   open, and on app quit / system shutdown. The user never has to remember to save
+   completely, so nothing can restore the tabs but lose their arrangement.
+
+   It is written on every change that matters (a terminal opened, a tab closed,
+   tabs reordered), on a slow heartbeat while terminals are open, and on app quit
+   / system shutdown. The user never has to remember to save
    — a kernel panic at 3am must not cost the day's terminals.
 2. **Explicit restore.** On startup the app compares the snapshot with the live
    tmux sessions. When the snapshot names terminals that no longer exist, the tab
@@ -56,8 +58,8 @@ agent's context.
 
 The pieces for the fix already exist and are only unconnected: per-task Claude
 session ids are already recorded (I01), `claude --resume` is already wired into
-terminal open (I02), tab order is already persisted, and session names are already
-deterministic from task id + index. The single missing artifact is a durable record
+terminal open (I02), tab order is already persisted (in localStorage, until this
+feature moves it), and session names are already deterministic from task id + index. The single missing artifact is a durable record
 of *which sessions existed*, because that has always been read out of a live tmux
 server's RAM.
 
@@ -103,7 +105,8 @@ turns "don't reboot, you'll lose the terminals" into a button.
 ### Storage
 `.terminals.json` in the data root next to `.llm-status.json` / `.claude-sessions.json`
 (gitignored, machine-local — session names are meaningless on another machine).
-Shape: `{ savedAt, terminals: [{ name, taskId, cwd, order, claudeSessionId, lastSeenAt }] }`.
+Shape: `{ savedAt, terminals: [{ name, taskId, cwd, order, claudeSessionId,
+claudeSessionCwd, lastSeenAt }] }`.
 Write through the existing atomic-write helper; a torn snapshot is worse than a
 stale one.
 
