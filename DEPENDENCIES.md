@@ -118,6 +118,7 @@ O05: O01
 O06: O01, O03, B06
 O07: O01, O03, O04, L01
 O08: O01, O02, O04, O05, F12
+O09: O03, O06, F02, F04, F12
 ```
 
 ## Build-order guarantee

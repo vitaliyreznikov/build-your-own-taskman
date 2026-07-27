@@ -122,3 +122,4 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **O06** Read-only structured task view — M — requires O01, O03, B06 — [spec](features/O06-structured-task-view.md)
 - [ ] **O07** Document index cache + blockers discovered from documents — M — requires O01, O03, O04, L01 — [spec](features/O07-document-index-and-blockers.md)
 - [ ] **O08** Agent-driven v1→v2 conversion — S — requires O01, O02, O04, O05, F12 — [spec](features/O08-agent-driven-v1-to-v2-conversion.md)
+- [ ] **O09** ⭐ Per-subgoal terminals — M — requires O03, O06, F02, F04, F12 — [spec](features/O09-per-subgoal-terminals.md)
