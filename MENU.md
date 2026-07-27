@@ -111,3 +111,14 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 ## Epic L — PR-review blocking
 
 - [ ] **L01** ⭐ Block a task on PR review, watch for reviews, auto-resume the agent — L — requires F12, E01, H07 — [spec](features/L01-pr-review-blocking.md)
+
+## Epic O — Structured task documents (v2)
+
+- [ ] **O01** ⭐ v2 structured task document (`I<N>.json`) — L — requires A01, A02, A06 — [spec](features/O01-v2-structured-task-document.md)
+- [ ] **O02** Per-task document type + v1/v2 coexistence — M — requires O01, A02 — [spec](features/O02-per-task-document-type.md)
+- [ ] **O03** ⭐ Nested subgoals with blockers (blocked is derived) — M — requires O01 — [spec](features/O03-nested-subgoals-with-blockers.md)
+- [ ] **O04** Task KB as JSONL (`I<N>/kb.jsonl`) — S — requires O01 — [spec](features/O04-task-kb-jsonl.md)
+- [ ] **O05** Explicit task timeline as JSONL (`I<N>/timeline.jsonl`) — S — requires O01 — [spec](features/O05-explicit-task-timeline.md)
+- [ ] **O06** Read-only structured task view — M — requires O01, O03, B06 — [spec](features/O06-structured-task-view.md)
+- [ ] **O07** Document index cache + blockers discovered from documents — M — requires O01, O03, O04, L01 — [spec](features/O07-document-index-and-blockers.md)
+- [ ] **O08** Agent-driven v1→v2 conversion — S — requires O01, O02, O04, O05, F12 — [spec](features/O08-agent-driven-v1-to-v2-conversion.md)

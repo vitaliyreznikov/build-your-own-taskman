@@ -25,12 +25,18 @@ graph TD
   F --> L[L · PR-review blocking]
   E --> L
   H --> L
+  A --> O[O · Structured task documents v2]
+  B --> O
+  L --> O
 ```
 
 **Read it as:** A is the ground floor (everything needs it). B is the UI on top.
 C/D extend A+B. E needs only the NextAction model. **F (terminals) is the hard
 gate** — G, H, and I are impossible without it, because the Claude hooks that
 power live status only fire when the in-app terminal exports `TASKS_TASK_ID`.
+**O (structured v2 documents)** is a second data model layered on A, viewed through
+B, and it extends L's PR poller — it is additive: v1 Markdown tasks keep working
+whether or not you build any of it.
 
 ## Adjacency list (machine-readable — the resolver uses this)
 
@@ -104,6 +110,14 @@ I02: I01
 J01: B01
 K01: E01, E03, F09, F12
 L01: F12, E01, H07
+O01: A01, A02, A06
+O02: O01, A02
+O03: O01
+O04: O01
+O05: O01
+O06: O01, O03, B06
+O07: O01, O03, O04, L01
+O08: O01, O02, O04, O05, F12
 ```
 
 ## Build-order guarantee
