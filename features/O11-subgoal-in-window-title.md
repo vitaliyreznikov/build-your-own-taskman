@@ -27,9 +27,12 @@ see, so it has to carry the finer-grained unit of work once that unit exists.
 ## Acceptance criteria (EARS)
 - When the active view is a terminal scoped to a subgoal, the system shall
   include that subgoal in the window title in addition to the task id and title.
-- Where the subgoal's text is known, the system shall show the subgoal id and
-  its text; where only the id (or the session-name slug) is known, the system
-  shall show that alone, without a dangling separator.
+- The system shall resolve the subgoal's real id and text from the task's
+  document, so a terminal it did not open itself (rediscovered from tmux after a
+  restart, or started by another agent) still names its subgoal in full rather
+  than showing the lossy session-name slug.
+- Where the subgoal's text cannot be resolved, the system shall show the id (or
+  the slug) alone, without a dangling separator.
 - Where the subgoal text is long, the system shall truncate it so the title
   stays readable in a title bar and window switcher.
 - When the active view is a task-level terminal or a task, the system shall
@@ -38,8 +41,13 @@ see, so it has to carry the finer-grained unit of work once that unit exists.
 ## Build notes
 - Extend the existing single title-computing effect (B13); do not add a second
   writer of `document.title`.
-- The subgoal id and text ride on the terminal tab when the terminal was opened
-  from the document view; a terminal rediscovered from tmux after a restart only
-  has the slugified id parsed out of its session name (O09) — fall back to it.
+- Fallback chain, widest source first: the task document (authoritative) → the
+  id and text the terminal tab was opened with → the slugified id parsed out of
+  the session name (O09).
+- The slug is lossy (dots become underscores), so match a document subgoal by
+  slugifying its id and comparing — never by trying to unslugify the name.
+- Follow document changes: subgoal text is edited by the agent working the task,
+  so the resolved label must be refreshed on the same file-change signal the
+  document view uses, and keyed by session name so a stale answer is never shown.
 - Use the same fallback chain the terminal tab label uses, so the tab and the
   window title never disagree about what a terminal is working on.
