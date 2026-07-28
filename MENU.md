@@ -124,3 +124,4 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **O08** Agent-driven v1→v2 conversion — S — requires O01, O02, O04, O05, F12 — [spec](features/O08-agent-driven-v1-to-v2-conversion.md)
 - [ ] **O09** ⭐ Per-subgoal terminals — M — requires O03, O06, F02, F04, F12 — [spec](features/O09-per-subgoal-terminals.md)
 - [ ] **O10** Open-only subgoal filter — S — requires O03, O06 — [spec](features/O10-open-only-subgoal-filter.md)
+- [ ] **O11** Subgoal in the window title — S — requires B13, O09 — [spec](features/O11-subgoal-in-window-title.md)
