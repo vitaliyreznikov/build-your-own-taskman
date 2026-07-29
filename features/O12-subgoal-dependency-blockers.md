@@ -59,12 +59,39 @@ Three reference cases are named, not left to the reader:
   has a home in `relations.md` (D01). An `sg` value that is not a plain subgoal id
   of this document is a dangling reference and is treated as one.
 
-Presentation follows O03: the chip carries the kind and its human-readable detail —
-the target's id, its text, and its current state ("waits for **g2** — get the cert
-issued *(doing)*"). The chip is a link: activating it expands and reveals the target
-subgoal in the tree, since "what am I waiting for" is unanswerable if the answer is
-collapsed three branches away. Everything remains **read-only** (O06): the view
-renders edges, it never adds, edits, or removes them.
+Presentation follows O03 — a chip on the row carrying the kind and its state
+(`⤴ after g1 · doing`) — with two additions, because a dependency is the one blocker
+kind whose subject is *also on this screen*.
+
+**The edge is readable in place.** Under a blocked row sits a one-line echo of what
+it waits for: the target's state marker, its id, its text.
+
+```
+▾ g1  Issue the cert                    → unblocks g3
+○ g3  Point DNS at it       ⤴ after g1 · doing
+      └ waits for: ◐ g1 Issue the cert
+○ g5  Roll prod             ⤴ after g3 · todo
+      └ waits for: ○ g3 Point DNS at it
+```
+
+The echo is shown by default while the dependency is unresolved and folded away once
+it is satisfied — the state the reader needs is "what is holding this up", and a
+cleared dependency is history. Its chip toggles it, and the id inside it is the link
+that jumps to the real row (expanding collapsed ancestors, and giving way on the
+open-only filter (O10) if that filter would hide a satisfied dependency's `done`
+target). Reading the edge must not require leaving the row you are reading; jumping
+is for when you want the target's own subtree.
+
+**The edge is visible from both ends.** A subgoal that others wait on carries a
+downstream chip naming them (`→ unblocks g3`), so "what does finishing this unlock"
+is answerable without searching the document for references to its id — the question
+that decides what to pick up next. It is shown only while the subgoal is not `done`,
+because once it is done it is holding nobody up and the chip would be noise. Its
+detail names any *other* unresolved blockers still on those dependents, since
+finishing this subgoal releases them only if it was their last one.
+
+Everything remains **read-only** (O06): the view renders edges, it never adds, edits,
+or removes them.
 
 The dependency changes what the tree *says*, never what order it renders in. Rows
 stay in document order (O06) and the open-only filter (O10) is unaffected: a blocked
@@ -132,8 +159,20 @@ can say which edge was the mistake.
 - While a `subgoal` blocker is rendered, the system shall present the referenced
   subgoal's id, its text, and its current state, together with the `note` when one is
   present.
-- When the user activates a rendered `subgoal` blocker, the system shall reveal the
-  referenced subgoal in the tree, expanding any collapsed ancestors of it.
+- While a `subgoal` blocker is unresolved, the system shall render the referenced
+  subgoal's state, id and text on the blocked subgoal's own row group, without
+  requiring the user to navigate to the referenced subgoal.
+- When a `subgoal` blocker is resolved, the system shall fold that in-place echo away
+  by default while keeping the chip.
+- When the user activates a rendered `subgoal` blocker, the system shall show or hide
+  the in-place echo of the referenced subgoal.
+- When the user activates the referenced subgoal's id, the system shall reveal that
+  subgoal in the tree, expanding any collapsed ancestors of it.
+- While a subgoal is not `done` and other subgoals depend on it, the system shall
+  render on its row the ids of the subgoals waiting for it.
+- When a subgoal is `done`, the system shall not render dependents on its row.
+- While dependents are rendered, the system shall state which of them carry further
+  unresolved blockers besides this dependency.
 - When the dependency edges of a document form a cycle, the system shall render every
   subgoal on that cycle as blocked and shall mark the participating blockers as
   circular, and shall not fail to parse, drop an edge, or alter the document.
@@ -153,8 +192,19 @@ can say which edge was the mistake.
   `resolved(b, states) = b.kind === 'subgoal' && states.get(b.sg) === 'done'`.
   Do not thread the whole document into the per-subgoal predicate, and do not look
   the target up by walking the tree per chip — that is quadratic on a deep document.
-- The id map is also the dangling-reference test (`!states.has(b.sg)`) and the source
-  of the chip's label, so building it once serves all three.
+- The id map is also the dangling-reference test (`!states.has(b.sg)`), the source of
+  the chip's label and the source of the in-place echo, so building it once serves
+  all four.
+- Reverse edges (`Map<targetId, dependentIds[]>`) come out of the same walk. Do not
+  compute them by scanning the tree per row — that is the quadratic trap again, and
+  the downstream chip renders on every row that has dependents.
+- The echo is a row in the same list item as the subgoal, not a child in the subgoal
+  tree: it must not be reachable by the tree walk, counted in any tally, or given a
+  subgoal terminal launcher. It is a rendering of a row that exists elsewhere.
+- Fold state for the echo is per (dependent, target) pair, defaulting to *shown while
+  unresolved*. Keep it in the same view state as the collapse map so a re-render
+  cannot forget it, and key it by both ids — a subgoal with two dependencies has two
+  independent echoes.
 - Cycle marking is a separate, single pass over the edge set — Tarjan or an iterative
   colour walk — done at index time, not per render. Its only output is the set of
   subgoal ids on a cycle; the chip reads that set. Resolution itself never traverses,
