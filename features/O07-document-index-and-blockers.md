@@ -3,7 +3,7 @@ id: O07
 epic: O — Structured task documents (v2)
 title: Document index cache + blockers discovered from documents
 size: M
-requires: [O01, O03, O04, L01]
+requires: [O01, O03, O04, L01, O09]
 novel: false
 ---
 
@@ -31,9 +31,17 @@ reading only `relations.md`. Its URL set becomes the **union** of
 - every `{kind:"pr", url}` blocker on every subgoal of every v2 document,
 
 so a **subgoal-level** PR blocker gets the same live review state, the same
-notification, and the same auto-resume of the task's agent as a task-level one.
+notification, and the same auto-resume as a task-level one.
 Excluded from the set: documents belonging to closed/done tasks, and blockers on
 subgoals that are `done` — otherwise the app polls a merged PR forever.
+
+The *reaction* differs in one way, and it matters: a blocker that names a subgoal
+resumes **that subgoal's terminal** (O09) — `task-<id>-sg-<subgoal>`, carrying the
+work-on-subgoal brief — not the task-level terminal with the whole-task brief. The
+PR blocks one step, so the agent that wakes up should be scoped to that step.
+Naming the subgoal in prose inside the extra prompt is not enough: the surrounding
+brief still tells the agent to work the entire task, and on a task with dozens of
+subgoals that is the wrong instruction.
 
 The same index answers **cross-task KB search**.
 
@@ -77,9 +85,17 @@ step does.
   blockers.
 - The PR-review poller shall poll the union of `blocked-by-pr` relation rows and every
   `pr` subgoal blocker found in the index.
-- When a PR discovered from a subgoal blocker receives its first human review, the
-  system shall react exactly as for a relation-table PR blocker (notify if a terminal
-  is live, otherwise open the task's terminal with the review context).
+- When a PR discovered from a subgoal blocker receives its first human review and a
+  terminal of that task is live, the system shall fire the same notification as for a
+  relation-table blocker and shall not open a terminal.
+- When a PR discovered from a **subgoal** blocker receives its first human review and
+  no terminal of that task is live, the system shall open **that subgoal's** terminal
+  (O09, `task-<id>-sg-<subgoal>`, work-on-subgoal brief) rather than the task-level
+  terminal.
+- Whenever the system opens a terminal in reaction to a review, the extra prompt
+  naming the reviewed PR shall reach the agent's first submission — including when a
+  tab record for that terminal already exists in the renderer from a previous
+  session or a restore.
 - The system shall exclude from the poll set PR blockers on subgoals whose state is
   `done` and documents whose task is in a closed or done column.
 - When the user searches across tasks, the system shall answer from the index over
@@ -101,9 +117,22 @@ step does.
 - Store `prUrls` with their owning subgoal id so the poller's reaction can name the
   subgoal in the notification and the resume prompt, and so review state can be
   attached back to the right chip in O06.
-- Reuse L01's `.pr-status.json` for review state and the fired-once baseline. Nothing
-  about the *reaction* changes; only the URL discovery does. Dedupe the union by
-  normalized URL so a PR blocking both a task row and a subgoal fires once.
+- Reuse L01's `.pr-status.json` for review state and the fired-once baseline. Dedupe
+  the union by normalized URL so a PR blocking both a task row and a subgoal fires
+  once.
+- **Thread the subgoal id, not just its text, all the way to the pty.** L01's
+  reaction hands the renderer `(taskId, prompt)`; that signature is what forces a
+  document blocker into a task-level terminal, because the id it needs to build the
+  O09 session name has already been discarded — the poller only kept the subgoal
+  *text*, for the prose. Carry `{subgoalId, subgoalText}` on the IPC payload and
+  branch to O09's `openSubgoalTerminal`.
+- **The renderer's "tab already exists" shortcut is where the review context dies.**
+  The task-terminal opener reuses a tab record by name and, in doing so, keeps the
+  old record — dropping the `extraPrompt` and `autoClaude` on the new request. A
+  restored-but-dead tab therefore starts `claude` with the plain work-on-task prompt
+  and no mention of the review at all, which reads as "the reaction fired but the
+  agent ignored it". Reusing the tab is right; keeping its stale fields is not — patch
+  the pending prompt onto the existing record.
 - Poll-set exclusions belong in the query, not the reaction: filter by column
   (A04/`tasks.md`) and subgoal state when building the set each tick. Otherwise the
   set only grows and the API cost grows with the archive.
