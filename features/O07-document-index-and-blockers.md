@@ -43,6 +43,18 @@ Naming the subgoal in prose inside the extra prompt is not enough: the surroundi
 brief still tells the agent to work the entire task, and on a task with dozens of
 subgoals that is the wrong instruction.
 
+**And the notify-vs-open test has to be scoped the same way.** L01 asks "does this
+*task* have a live terminal?"; for a subgoal blocker the honest question is "does
+*this subgoal* have one?" A big v2 task normally has several agents running at once
+— one per subgoal, which is the whole point of O09 — so the task-wide test is true
+almost always, and every subgoal review silently degrades to a notification while
+the step that was actually unblocked never gets an agent. A live sibling is not a
+reason to skip opening: the reviewed PR blocks *this* step, and no agent working
+another step will pick it up. Only a live terminal **on that same subgoal** means
+someone is already there, and that is the one case that should notify instead —
+naming the subgoal, since on a many-subgoal task "PR reviewed — I244" doesn't say
+where to look.
+
 The same index answers **cross-task KB search**.
 
 ## Why it exists
@@ -85,13 +97,17 @@ step does.
   blockers.
 - The PR-review poller shall poll the union of `blocked-by-pr` relation rows and every
   `pr` subgoal blocker found in the index.
-- When a PR discovered from a subgoal blocker receives its first human review and a
-  terminal of that task is live, the system shall fire the same notification as for a
-  relation-table blocker and shall not open a terminal.
+- The live-terminal test that decides notify-vs-open shall be scoped to the **blocked
+  unit of work**: that subgoal for a subgoal blocker, the whole task for a task-level
+  (`relations.md`) blocker.
 - When a PR discovered from a **subgoal** blocker receives its first human review and
-  no terminal of that task is live, the system shall open **that subgoal's** terminal
+  **that subgoal's own** terminal is live, the system shall fire the same notification
+  as for a relation-table blocker — naming the subgoal — and shall not open a terminal.
+- When a PR discovered from a **subgoal** blocker receives its first human review and
+  that subgoal has no live terminal, the system shall open **that subgoal's** terminal
   (O09, `task-<id>-sg-<subgoal>`, work-on-subgoal brief) rather than the task-level
-  terminal.
+  terminal — **even when the task-level terminal or other subgoals' terminals of the
+  same task are live**.
 - Whenever the system opens a terminal in reaction to a review, the extra prompt
   naming the reviewed PR shall reach the agent's first submission — including when a
   tab record for that terminal already exists in the renderer from a previous
@@ -120,6 +136,12 @@ step does.
 - Reuse L01's `.pr-status.json` for review state and the fired-once baseline. Dedupe
   the union by normalized URL so a PR blocking both a task row and a subgoal fires
   once.
+- **Scope the live-terminal predicate, don't add a second one.** L01's predicate takes
+  a task id and matches any `task-<id>*` tmux session; give it an *optional* subgoal id
+  and, when present, compare the subgoal slug parsed out of the session name (O09) as
+  well. Optional, not a new function, because the same predicate also gates K01 autorun
+  — which is task-level and must keep matching any of the task's sessions, subgoal ones
+  included, or autorun starts a second whole-task agent next to a running one.
 - **Thread the subgoal id, not just its text, all the way to the pty.** L01's
   reaction hands the renderer `(taskId, prompt)`; that signature is what forces a
   document blocker into a task-level terminal, because the id it needs to build the

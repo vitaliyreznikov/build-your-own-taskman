@@ -30,6 +30,11 @@ the PR author, excluding bots), the app reacts per blocking task:
   > PR &lt;url&gt; is reviewed. Check everything and identify next steps. Ask me
   > for approval.
 
+Both branches test **the task**, because in L01 a blocker belongs to a task and
+nothing smaller. O07 adds subgoal-level blockers and narrows the test to match:
+there, the unit is the subgoal, so the live-terminal question — and the terminal
+that gets opened — is that subgoal's, not the task's.
+
 One task can be blocked by **several** PRs, and one PR can block several tasks.
 Blockers are added and removed from the PRs view (paste a PR URL, pick the task);
 there is no per-task-panel editing for this relation.
