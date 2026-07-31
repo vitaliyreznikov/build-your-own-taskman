@@ -126,3 +126,4 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **O10** Open-only subgoal filter — S — requires O03, O06 — [spec](features/O10-open-only-subgoal-filter.md)
 - [ ] **O11** Subgoal in the window title — S — requires B13, O09 — [spec](features/O11-subgoal-in-window-title.md)
 - [ ] **O12** ⭐ Subgoal-to-subgoal dependency blockers — M — requires O03, O06 — [spec](features/O12-subgoal-dependency-blockers.md)
+- [ ] **O13** Subgoal title vs description (the row is the title) — S — requires O03, O06 — [spec](features/O13-subgoal-title-and-description.md)
