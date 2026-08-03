@@ -89,6 +89,11 @@ see from inside the sandbox.
 - When a tracked PR becomes reviewed and a blocking task **has a live terminal**,
   the system shall fire a desktop notification and shall **not** open a new
   terminal.
+- The reviewed notification shall carry the pull request's **full URL as the first
+  line of its body**, so no truncation of the banner can hide the link.
+- When the user activates the reviewed notification, the system shall open that
+  pull request in the browser; focusing the app shall be a separate action on the
+  same notification.
 - When a tracked PR becomes reviewed and a blocking task **has no live terminal**,
   the system shall open the task's terminal (F12 auto-start + IN PROGRESS) and
   append an extra prompt naming the reviewed PR and asking for next steps +
@@ -125,6 +130,12 @@ see from inside the sandbox.
   an immediate catch-up poll; adding a blocker and the "Check now" IPC poll
   unconditionally. Runs only while the desktop app is open (opening a terminal is
   a renderer operation) — same constraint as K01 autorun.
+- **Notification layout is link-first.** A macOS banner shows two or three lines
+  and elides the rest, so the url goes on the body's first line and the prose that
+  used to be there (PR title, task, subgoal) collapses into the subtitle as
+  `repo#num · task · subgoal`. Clicking the banner is the "jump to GitHub" route;
+  the app-focus route becomes a notification action button, since a banner has
+  exactly one click target.
 - **Guardrail alignment.** Auto-opening a terminal *starts an autonomous agent*,
   but here it is gated on a real external event (a human reviewed the PR) and the
   appended prompt explicitly ends with "Ask me for approval" — the agent
