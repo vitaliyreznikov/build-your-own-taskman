@@ -35,6 +35,18 @@ notification, and the same auto-resume as a task-level one.
 Excluded from the set: documents belonging to closed/done tasks, and blockers on
 subgoals that are `done` — otherwise the app polls a merged PR forever.
 
+That union is deduplicated on `(task, url)`, and **the document row must win the
+tie.** The two rows are not interchangeable: only the document row carries the
+subgoal, the merge order and the recorded state (O14). If the `relations.md` row
+wins — which is what a naive relations-first concatenation does, and what shipped
+until 2026-08-04 — a subgoal blocker that someone also hand-added to
+`relations.md` is silently demoted to task-level: the notify-vs-open test below
+goes task-wide again, and the O14 write-back is skipped because there is no
+subgoal to patch. The symptom is a PR approval that produces a notification (or
+nothing) while the blocked subgoal never gets its terminal, and a document whose
+`state:` stays stale forever. Both the poller's tracked set and the PRs view's
+`prBlocks` snapshot dedupe this way.
+
 The *reaction* differs in one way, and it matters: a blocker that names a subgoal
 resumes **that subgoal's terminal** (O09) — `task-<id>-sg-<subgoal>`, carrying the
 work-on-subgoal brief — not the task-level terminal with the whole-task brief. The
