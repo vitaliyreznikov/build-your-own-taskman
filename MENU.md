@@ -95,6 +95,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **H08** Per-terminal status keying + icon on tab — M — requires F05, H03
 - [ ] **H09** Jump to next terminal needing attention — M — requires H08
 - [ ] **H10** waiting-vs-attention semantics ("never waiting on me") — S — requires H04
+- [ ] **H11** Agent-agnostic status via Devin CLI hooks and exports — L — requires H03, H04, H05, H06, H08, F15 — [spec](features/H11-agent-agnostic-status-via-devin-hooks.md)
 
 ## Epic I — Claude session history & resume
 
