@@ -28,6 +28,7 @@ graph TD
   A --> O[O · Structured task documents v2]
   B --> O
   L --> O
+  O --> K
 ```
 
 **Read it as:** A is the ground floor (everything needs it). B is the UI on top.
@@ -112,6 +113,7 @@ I01: F02, H03
 I02: I01
 J01: B01
 K01: E01, E03, F09, F12
+K02: K01, O03, O09
 L01: F12, E01, H07
 O01: A01, A02, A06
 O02: O01, A02

@@ -110,6 +110,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 ## Epic K — Scheduled autorun
 
 - [ ] **K01** ⭐ Scheduled autorun (once + cron) of a task's Claude terminal — L — requires E01, E03, F09, F12 — [spec](features/K01-scheduled-autorun.md)
+- [ ] **K02** Scheduled autorun (once + cron) of a single subgoal's Claude terminal — M — requires K01, O03, O09 — [spec](features/K02-subgoal-autorun.md)
 
 ## Epic L — PR-review blocking
 
