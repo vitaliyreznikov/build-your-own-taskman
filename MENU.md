@@ -137,3 +137,4 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 
 - [ ] **P01** ⭐ Control API core (loopback HTTP + command registry + approval gate + `taskman` CLI) — L — requires A02, E01, F09 — [spec](features/P01-agent-control-api-core.md)
 - [ ] **P02** `open-terminal` command (agent asks to open a task/subgoal terminal) — M — requires P01, F12, F09, O09 — [spec](features/P02-open-terminal-command.md)
+- [ ] **P03** `create-task` command (agent files a new task; title+body only, rest via file edits) — S — requires P01, A02, A07 — [spec](features/P03-create-task-command.md)
