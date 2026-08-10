@@ -132,3 +132,8 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **O12** ⭐ Subgoal-to-subgoal dependency blockers — M — requires O03, O06 — [spec](features/O12-subgoal-dependency-blockers.md)
 - [ ] **O13** Subgoal title vs description (the row is the title) — S — requires O03, O06 — [spec](features/O13-subgoal-title-and-description.md)
 - [ ] **O14** ⭐ PR blocker carries live state + merge order (`after`) — M — requires O03, O06, O07, L01 — [spec](features/O14-pr-state-and-merge-order.md)
+
+## Epic P — Agent-facing control API  · a first-class way for agents to act on the board
+
+- [ ] **P01** ⭐ Control API core (loopback HTTP + command registry + approval gate + `taskman` CLI) — L — requires A02, E01, F09 — [spec](features/P01-agent-control-api-core.md)
+- [ ] **P02** `open-terminal` command (agent asks to open a task/subgoal terminal) — M — requires P01, F12, F09, O09 — [spec](features/P02-open-terminal-command.md)

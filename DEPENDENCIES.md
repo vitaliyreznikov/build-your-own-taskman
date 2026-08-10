@@ -29,6 +29,9 @@ graph TD
   B --> O
   L --> O
   O --> K
+  E --> P[P · Agent-facing control API]
+  F --> P
+  O --> P
 ```
 
 **Read it as:** A is the ground floor (everything needs it). B is the UI on top.
@@ -129,6 +132,8 @@ O11: B13, O09
 O12: O03, O06
 O13: O03, O06
 O14: O03, O06, O07, L01
+P01: A02, E01, F09
+P02: P01, F12, F09, O09
 ```
 
 ## Build-order guarantee
