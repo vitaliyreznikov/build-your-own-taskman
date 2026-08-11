@@ -22,6 +22,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **A09** Git sync engine (debounced background commits) — M — requires A01
 - [ ] **A10** External mirror sync (e.g. Obsidian vault) — M — requires A09
 - [ ] **A11** Sync status indicator + manual "sync now" — S — requires A09
+- [ ] **A12** Reuse a recently-freed id (bounded window, terminal-guarded) — S — requires A07, F02, F14 — [spec](features/A12-recent-id-reuse.md)
 
 ## Epic B — Kanban board UI  · foundation
 
