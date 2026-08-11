@@ -31,6 +31,10 @@ never jump around under the cursor as agent state changes.
 - The user shall be able to drag a terminal tab across a divider, and the tab
   shall land on the side it was dropped on (a divider never blocks a reorder).
 - The user shall be able to remove a divider.
+- When the tab immediately to a divider's right is closed, the system shall
+  re-anchor that divider to the closed tab's successor (the next surviving tab,
+  or the strip end if it was last) so the divider keeps its position instead of
+  jumping to the end of the strip.
 - When the divider positions change, the system shall persist them so they are
   restored on the next launch.
 - The system shall not create, rename, or restart any tmux session when a
