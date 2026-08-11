@@ -136,6 +136,7 @@ O14: O03, O06, O07, L01
 P01: A02, E01, F09
 P02: P01, F12, F09, O09
 P03: P01, A02, A07
+P04: P02
 ```
 
 ## Build-order guarantee
