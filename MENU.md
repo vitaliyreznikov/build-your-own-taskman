@@ -141,3 +141,4 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **P02** `open-terminal` command (agent asks to open a task/subgoal terminal) — M — requires P01, F12, F09, O09 — [spec](features/P02-open-terminal-command.md)
 - [ ] **P03** `create-task` command (agent files a new task; title+body only, rest via file edits) — S — requires P01, A02, A07 — [spec](features/P03-create-task-command.md)
 - [ ] **P04** `run` verb + "task worker" vs "subagent" naming (so "run I396" reaches the API, not a subagent) — S — requires P02 — [spec](features/P04-run-task-worker-naming.md)
+- [ ] **P05** `rebind-terminal` command (a worker re-labels its tab onto a different existing task; overlay, not rename) — M — requires P01, P02, H08, F09 — [spec](features/P05-rebind-terminal-command.md)
