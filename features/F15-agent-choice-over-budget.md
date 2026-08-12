@@ -51,7 +51,10 @@ human in the loop only when they're actually there to answer.
 ## Acceptance criteria (EARS)
 - When a task/subgoal terminal is opened **manually** and the weekly balance is
   negative, the system shall present a chooser offering Claude or Devin (and a
-  cancel), and shall launch the chosen agent with the work-on-task prompt.
+  cancel), and shall launch the chosen agent with the work-on-task prompt. This
+  covers **every** manual open path, including the terminal-strip **"+" new-task
+  button** (F13): it routes through the same chooser and launches the chosen agent
+  with the *create-task* prompt (and, F17, the picked model).
 - When a terminal is opened by an **unattended** trigger (scheduled autorun or a
   PR-review auto-resume) and the weekly balance is negative, the system shall
   launch **Devin** with the work-on-task prompt and shall present no chooser.
