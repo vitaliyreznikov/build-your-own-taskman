@@ -79,6 +79,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **F14** ⭐ Terminal set survives a reboot — auto-saved snapshot + one-click restore — M — requires F06, F07, F09, I02 — [spec](features/F14-terminal-set-survives-reboot.md)
 - [ ] **F15** ⭐ Agent choice (Claude vs Devin) when over weekly budget — M — requires F12, J01 — [spec](features/F15-agent-choice-over-budget.md)
 - [ ] **F16** Movable tab dividers (view-only separators, drag like tabs) — S — requires F06, F07 — [spec](features/F16-movable-tab-dividers.md)
+- [ ] **F17** Model-tier dropdown in the Claude/Devin chooser (cross-mapped, one axis) — S — requires F15 — [spec](features/F17-model-tier-in-agent-chooser.md)
 
 ## Epic G — Prompt-parts library
 
