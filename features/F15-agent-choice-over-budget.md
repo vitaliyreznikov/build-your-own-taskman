@@ -90,3 +90,10 @@ human in the loop only when they're actually there to answer.
   supervision layer agent-agnostic is out of scope here.
 - Gate the whole feature behind a boolean config (reference app:
   `OVER_BUDGET_AGENT_CHOICE`) so it can be turned off, mirroring F12's flag.
+- **Devin permission mode**: launch Devin with `--permission-mode smart` (reference
+  app constant `DEVIN_PERMISSION_MODE`), not its `auto` default. `smart`
+  auto-approves read-only tools *and* workspace edits and auto-runs actions a fast
+  model judges safe, so an unattended/handed-off Devin session actually makes
+  progress instead of stalling on every edit approval — matching how the
+  Claude-Code terminals here already run. Riskier actions still prompt; `dangerous`
+  is deliberately not used.
