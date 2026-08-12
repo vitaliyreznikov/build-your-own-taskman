@@ -80,6 +80,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **F15** ⭐ Agent choice (Claude vs Devin) when over weekly budget — M — requires F12, J01 — [spec](features/F15-agent-choice-over-budget.md)
 - [ ] **F16** Movable tab dividers (view-only separators, drag like tabs) — S — requires F06, F07 — [spec](features/F16-movable-tab-dividers.md)
 - [ ] **F17** Model-tier dropdown in the Claude/Devin chooser (cross-mapped, one axis) — S — requires F15 — [spec](features/F17-model-tier-in-agent-chooser.md)
+- [ ] **F19** Agent chooser for programmatic opens (API wait + scheduled 30s countdown) — M — requires F15, F17, P02, K01, L01 — [spec](features/F19-agent-chooser-for-programmatic-opens.md)
 
 ## Epic G — Prompt-parts library
 
