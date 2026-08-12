@@ -100,6 +100,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **H10** waiting-vs-attention semantics ("never waiting on me") — S — requires H04
 - [ ] **H11** Agent-agnostic status via Devin CLI hooks and exports — L — requires H03, H04, H05, H06, H08, F15 — [spec](features/H11-agent-agnostic-status-via-devin-hooks.md)
 - [ ] **H12** Dedicated permission-approval status icon — S — requires H06, H08, H11 — [spec](features/H12-permission-approval-status.md)
+- [ ] **H13** Devin waiting-state (approval/input) via TUI pane-scraping (hooks can't see it) — M — requires H11, H12, F15 — [spec](features/H13-devin-waiting-state-via-pane-scraping.md)
 
 ## Epic I — Claude session history & resume
 
