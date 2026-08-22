@@ -142,6 +142,7 @@ P02: P01, F12, F09, O09
 P03: P01, A02, A07
 P04: P02
 P05: P01, P02, H08, F09
+P06: P01, P02
 ```
 
 ## Build-order guarantee
