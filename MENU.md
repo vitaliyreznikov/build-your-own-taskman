@@ -40,6 +40,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **B12** Full-page single-task view (level switcher) — M — requires B01, B06
 - [ ] **B13** OS window title follows active view — S — requires B12
 - [ ] **B14** Light / dark theme with a manual toggle (System / Light / Dark) — M — requires B01, F01 — [spec](features/B14-light-dark-theme-toggle.md)
+- [ ] **B15** In-app terminal follows the colour theme (light xterm + chrome in Light mode) — M — requires B14, F01 — [spec](features/B15-terminal-follows-theme.md)
 
 ## Epic C — Boards / views / filters
 
