@@ -43,6 +43,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **B14** Light / dark theme with a manual toggle (System / Light / Dark) — M — requires B01, F01 — [spec](features/B14-light-dark-theme-toggle.md)
 - [ ] **B15** In-app terminal follows the colour theme (light xterm + chrome in Light mode) — M — requires B14, F01 — [spec](features/B15-terminal-follows-theme.md)
 - [ ] **B16** Sidebar follows the colour theme (light sidebar in Light mode) — S — requires B14 — [spec](features/B16-sidebar-follows-theme.md)
+- [ ] **B17** Board picker modal on new-task "+" (choose job/personal/brootto/…) — S — requires B04, A05, A13 — [spec](features/B17-board-picker-on-new-task.md)
 
 ## Epic C — Boards / views / filters
 
