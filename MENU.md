@@ -23,6 +23,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **A10** External mirror sync (e.g. Obsidian vault) — M — requires A09
 - [ ] **A11** Sync status indicator + manual "sync now" — S — requires A09
 - [ ] **A12** Reuse a recently-freed id (bounded window, terminal-guarded) — S — requires A07, F02, F14 — [spec](features/A12-recent-id-reuse.md)
+- [ ] **A13** Default board for new tasks (`personal`, not list-order) — S — requires A05, A07 — [spec](features/A13-default-board-for-new-tasks.md)
 
 ## Epic B — Kanban board UI  · foundation
 
