@@ -44,6 +44,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **B15** In-app terminal follows the colour theme (light xterm + chrome in Light mode) — M — requires B14, F01 — [spec](features/B15-terminal-follows-theme.md)
 - [ ] **B16** Sidebar follows the colour theme (light sidebar in Light mode) — S — requires B14 — [spec](features/B16-sidebar-follows-theme.md)
 - [ ] **B17** Board picker modal on new-task "+" (choose job/personal/brootto/…) — S — requires B04, A05, A13 — [spec](features/B17-board-picker-on-new-task.md)
+- [ ] **B18** Board picker on the terminal-strip "+" (same modal as B17; fixes silent create onto a F20-hidden board) — S — requires B17, F13, F20 — [spec](features/B18-board-picker-on-terminal-plus.md)
 
 ## Epic C — Boards / views / filters
 
