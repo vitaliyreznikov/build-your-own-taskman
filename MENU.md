@@ -88,6 +88,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **F17** Model-tier dropdown in the Claude/Devin chooser (cross-mapped, one axis) — S — requires F15 — [spec](features/F17-model-tier-in-agent-chooser.md)
 - [ ] **F19** Agent chooser for programmatic opens (API wait + scheduled 30s countdown) — M — requires F15, F17, P02, K01, L01 — [spec](features/F19-agent-chooser-for-programmatic-opens.md)
 - [ ] **F20** Filter terminal tabs by board (sidebar checkboxes hide a board's terminals) — S — requires F06, A05 — [spec](features/F20-terminal-board-filter.md)
+- [ ] **F21** Persistent default terminal provider (Claude or Codex) — M — requires F12 — [spec](features/F21-default-terminal-provider.md)
 
 ## Epic G — Prompt-parts library
 
