@@ -68,6 +68,9 @@ human in the loop only when they're actually there to answer.
   shall fail **open** to Claude (never block a terminal on a usage error).
 - When the whole behaviour is disabled by config, the system shall always launch
   Claude and present no chooser regardless of budget.
+- When the whole behaviour is disabled by config, the system shall not substitute
+  Devin on **any** path — including scheduled autorun fires decided in the main
+  process — so the only way Devin launches is an explicit `--agent devin` request.
 
 ## Build notes
 - **Over-budget signal**: compute in the main process from the same data J01's
@@ -90,6 +93,9 @@ human in the loop only when they're actually there to answer.
   supervision layer agent-agnostic is out of scope here.
 - Gate the whole feature behind a boolean config (reference app:
   `OVER_BUDGET_AGENT_CHOICE`) so it can be turned off, mirroring F12's flag.
+  Put the flag where **both** processes read it (reference app: `shared/`): the
+  autorun fire picks its agent in main before the renderer ever sees it, so a
+  renderer-only flag leaves unattended fires still switching to Devin.
 - **Devin permission mode**: launch Devin with `--permission-mode smart` (reference
   app constant `DEVIN_PERMISSION_MODE`), not its `auto` default. `smart`
   auto-approves read-only tools *and* workspace edits and auto-runs actions a fast
