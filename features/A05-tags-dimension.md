@@ -8,6 +8,10 @@ novel: false
 ---
 
 ## What
+> **Renamed by [A14](A14-category-dimension.md):** the dimension is now called
+> *category* (`categories.md`, `Category` column) and is single-valued. The
+> text below is the original A05 design.
+
 A file, `boards.md`, defines a tag dimension for tasks (e.g. `job`, `personal`).
 Each task can carry one or more of these tags; they surface in the UI as the
 "Board" column on a card and as a "Tags" filter over the board. This is a

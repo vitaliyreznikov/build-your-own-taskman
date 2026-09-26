@@ -15,7 +15,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **A02** Central task index/table (`tasks.md`) — S — [spec](features/A02-tasks-index.md)
 - [ ] **A03** Global ordering file (`order.md`) — S — requires A02
 - [ ] **A04** Column definitions (`columns.md`: NEXT/IN PROGRESS/BLOCKED/DONE/CLOSED) — S — requires A02
-- [ ] **A05** Tags dimension (`boards.md`) — S — requires A02
+- [ ] **A05** Tags dimension (`boards.md`; renamed to categories by A14) — S — requires A02
 - [ ] **A06** Atomic file writes (temp-then-rename) — S
 - [ ] **A07** Stable ID allocation — S — requires A02
 - [ ] **A08** Per-task detail directory (`I<N>/`) — S — requires A01
@@ -24,6 +24,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **A11** Sync status indicator + manual "sync now" — S — requires A09
 - [ ] **A12** Reuse a recently-freed id (bounded window, terminal-guarded) — S — requires A07, F02, F14 — [spec](features/A12-recent-id-reuse.md)
 - [ ] **A13** Default board for new tasks (`personal`, not list-order) — S — requires A05, A07 — [spec](features/A13-default-board-for-new-tasks.md)
+- [ ] **A14** Category dimension (rename `boards.md` tags → `categories.md`, one per task) — M — requires A05, A13 — [spec](features/A14-category-dimension.md)
 
 ## Epic B — Kanban board UI  · foundation
 
