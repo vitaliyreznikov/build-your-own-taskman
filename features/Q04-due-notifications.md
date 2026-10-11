@@ -21,17 +21,19 @@ selected. On launch, instead of one banner per already-overdue task, the system
 shows a single summary ("3 overdue, 2 due today").
 
 ## Why it exists
-E01 notifies only P0 tasks, because planned work at lower priority does not need
+E01 notifies only P0 tasks (and, since Q04, only those without a Due), because planned work at lower priority does not need
 an interrupt. Time-bound tasks are the opposite: a P2 "take medicine" must
 interrupt at its time. Acting from the banner closes the loop without switching to
 the app.
 
 ## Acceptance criteria (EARS)
 - When a time-bound task's Start arrives, the system shall show a notification
-  naming the task and its Due, unless the task is P0 (E01 already notifies at
-  Start).
+  naming the task and its Due, at any priority.
 - When a time-bound task's Due passes while it is open, the system shall show an
-  overdue notification for it, once per occurrence.
+  overdue notification for it, once per occurrence; for a repeating task with no
+  window the notification shall read "Now: <title>" instead of "Overdue".
+- The E01 P0 notification shall not fire for a task that has a Due — Q04 owns
+  its notifications, so a P0 chore gets one banner (with Done / Snooze), not two.
 - When the user clicks Done on a notification, the system shall mark the task done
   exactly as the Today view's ✓ does (Q02/Q03).
 - When the user clicks Snooze 1h, the system shall set Start to now + 1 hour.

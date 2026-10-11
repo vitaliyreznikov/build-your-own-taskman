@@ -13,7 +13,7 @@ DONE or CLOSED, ordered by Due and grouped:
 
 | Group | Contains |
 |---|---|
-| **Overdue** | Due < now |
+| **Overdue** | Due < now (except "due now" repeats, below) |
 | **Today** | Due later today |
 | **Tomorrow** | Due tomorrow (collapsed) |
 | **This week** | Due within the next 7 days (collapsed) |
@@ -32,7 +32,15 @@ time: a P2 pill reminder is more urgent at 09:55 than a P0 project. The Today vi
 is the time-ordered lens — one place to see everything that is due and tick it off
 — while the boards stay the priority lens (time-bound tasks still show there).
 
+A repeating task with **no window** (`cron:0 7 * * *`) is *due now* from its
+occurrence until the next occurrence starts: it is listed under **Today** (not
+Overdue) and is not rendered as overdue anywhere. "Show it at 07:00" is the
+intent; nothing is late until the next occurrence makes it missed.
+
 ## Acceptance criteria (EARS)
+- While a repeating task with no window is in its current occurrence, the system
+  shall list it under Today and shall not render it as overdue (row, card chip,
+  task panel).
 - The sidebar shall have a **Today** entry that opens the Today view.
 - The Today view shall list every task with a Due that is not DONE or CLOSED, in
   every category, sorted by Due ascending, in the groups above; Tomorrow, This
