@@ -8,16 +8,23 @@ novel: false
 ---
 
 ## What
-A new `tasks.md` column **`Repeat`**: empty (one-off) or `cron:<m> <h> <dom> <mon>
-<dow>` — the same 5-field, local-time grammar autorun uses (K01). The cron defines
-the task's **Due** times; the task's lead time (Due − Start) is kept for every
-occurrence. A repeating task never moves to DONE by being done — it **advances**:
+A new `tasks.md` column **`Repeat`**: empty (one-off) or
+`cron:<m> <h> <dom> <mon> <dow>` optionally followed by a **window** `+<dur>`
+(`+30m`, `+2h`, `+1d`, `+1h30m`). The cron is the same 5-field, local-time grammar
+autorun uses (K01). Each cron occurrence is when an occurrence **starts**; its
+**Due** is start + window (no window = due at the start time itself).
+`cron:0 8,20 * * * +2h` = "08:00 and 20:00, each within two hours".
 
-- **✓ Done** → log `done`, Due becomes the next occurrence, Start = new Due − lead.
+The row's Start/Due always hold the **current** occurrence. A repeating task never
+moves to DONE by being done — it **advances**:
+
+- **✓ Done** → log `done`, move Start/Due to the next occurrence.
 - **✕ Skip** → same, logged `skipped`.
-- **Missed** → when the *next* occurrence's Start (or its Due, if there is no lead)
-  arrives while the current one is still open, the current one is logged `missed`
-  and the task advances.
+- **Missed** → when the *next* occurrence's start arrives while the current one is
+  still open, the current one is logged `missed` and the task advances.
+
+The current occurrence is always Due − window, so snoozing (which moves only
+Start) never corrupts the schedule.
 
 Every occurrence outcome is appended to **`due-log.jsonl`** at the data root, one
 line each:
@@ -33,19 +40,20 @@ single Column value cannot hold.
 
 ## Acceptance criteria (EARS)
 - The system shall read `Repeat` from `tasks.md`; a missing cell or empty value
-  shall mean the task does not repeat. A value that is not a valid `cron:` spec
-  shall be treated as not repeating, and the task panel shall flag it.
-- When a valid Repeat is set on a task whose Due is empty or in the past, the
-  system shall set Due to the next cron occurrence after now.
+  shall mean the task does not repeat. A value that is not a valid
+  `cron:<expr> [+<dur>]` shall be treated as not repeating, and the task panel
+  shall flag it.
+- When a valid Repeat is set or changed on a task, the system shall set Start/Due
+  to the occurrence that is open now (started, Due not yet passed) if there is one,
+  else to the next occurrence after now.
 - When a repeating task is marked done, the system shall append a `done` line to
-  `due-log.jsonl`, set Due to the first cron occurrence after the later of the old
-  Due and now, set Start to the new Due minus the old lead (or leave Start empty if
-  there was none), and leave the task's Column unchanged.
+  `due-log.jsonl`, set Start to the next cron occurrence after the current one and
+  Due to that plus the window, and leave the task's Column unchanged.
 - When a repeating task is skipped, the system shall do the same with `skipped`.
-- When the next occurrence's start time arrives while the current occurrence is
-  not done or skipped, the system shall append a `missed` line for the current one
+- When the next occurrence's start arrives while the current occurrence is not
+  done or skipped, the system shall append a `missed` line for the current one
   and advance; if several occurrences were passed (e.g. the app was closed), it
-  shall log each, up to a cap, and land on the first occurrence not yet started.
+  shall log each, up to a cap, and land on the newest occurrence that has started.
 - When any task that has a Due is moved to DONE, the system shall append a `done`
   line for it.
 - The system shall append to `due-log.jsonl`, never rewrite it.
@@ -54,6 +62,8 @@ single Column value cannot hold.
 - The UI shall mark repeating tasks with 🔁 on cards and Today rows.
 
 ## Build notes
+- The window lives in the Repeat cell, not in the Start/Due gap: Start is
+  user-movable (snooze), so a lead derived from it would drift.
 - Share the cron parser and "next occurrence" helper with K01 if you built it.
 - The missed check runs in the main process on app start, on every `tasks.md`
   change, and on a timer armed for the earliest next-occurrence start.
