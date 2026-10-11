@@ -59,7 +59,8 @@ carry both, and gives the Today view an unambiguous thing to sort by.
   the same concept under the JSON key `nextAction`, and renaming the code
   identifier without migrating those documents would split one concept across two
   names. The rename is of the column and the UI.
-- Snooze actions (Q02) move Start and are exempt from the Start ≤ Due check — a
-  snoozed overdue task is still overdue; the check guards hand edits only.
+- Snooze (Q02) moves Start and Due together, so it keeps Start ≤ Due by
+  construction. Repeating tasks can't be snoozed; their Start/Due are read-only
+  in the task panel (the schedule owns them).
 - Update agent-facing docs (AGENTS.md, scheduling skill) in the same change:
   agents hand-edit `tasks.md` by column name.

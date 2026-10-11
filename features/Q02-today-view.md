@@ -21,8 +21,11 @@ DONE or CLOSED, ordered by Due and grouped:
 | **Done today** | occurrences completed today (collapsed) |
 
 Each row shows the due time, task id, title, a 🔁 mark if it repeats (Q03), the
-category, and three actions: **✓ Done**, **⏰ Snooze** (15 min / 1 h / 3 h /
-tomorrow 09:00) and — on repeating tasks only — **✕ Skip**. A row whose Start is
+category, and actions: **✓ Done**, then **⏰ Snooze** (15 min / 1 h / 3 h /
+tomorrow 09:00) on one-off tasks or **✕ Skip** on repeating ones. Snoozing a
+one-off task moves **both** Start and Due, keeping the gap between them; a
+repeating task has nothing to move — its times come from the schedule — so it
+offers Skip instead. A row whose Start is
 still in the future is dimmed and says "starts <time>". Clicking a row opens the
 task's panel. The sidebar entry shows a badge: overdue + due-today count.
 
@@ -49,8 +52,11 @@ intent; nothing is late until the next occurrence makes it missed.
   "starts <time>".
 - When the user clicks ✓ on a non-repeating task, the system shall move it to
   DONE (and, if Q03 is built, record a `done` occurrence in its log).
-- When the user picks a snooze duration, the system shall set the task's Start to
-  now + that duration and shall not change its Due.
+- When the user picks a snooze duration on a non-repeating task, the system shall
+  set Start to now + that duration and Due to the new Start plus the previous
+  Due − Start gap (zero if Start was empty or after Due).
+- The system shall not offer snooze on a repeating task, and shall reject a
+  snooze request for one.
 - When the user clicks a row outside its actions, the system shall open that
   task's panel.
 - The Today entry shall show a badge with the number of listed tasks whose Due is
