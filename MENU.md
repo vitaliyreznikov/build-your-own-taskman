@@ -161,5 +161,5 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 
 - [ ] **Q01** Start and Due times (rename NextAction → Start, add Due; Start ≤ Due) — M — requires A02, B02, B10 — [spec](features/Q01-start-and-due-times.md)
 - [ ] **Q02** Today view (every task with a Due, grouped by time; Done / Snooze / Skip) — M — requires Q01, B06 — [spec](features/Q02-today-view.md)
-- [ ] **Q03** Repeating time-bound tasks (`Repeat` cron, advance on done/skip/missed, `due-log.jsonl`) — M — requires Q01, Q02 — [spec](features/Q03-repeating-tasks.md)
+- [ ] **Q03** Repeating time-bound tasks (`Repeat` cron, advance on done/skip/missed, `due-log.jsonl`, `each` autorun per occurrence) — M — requires Q01, Q02 — [spec](features/Q03-repeating-tasks.md)
 - [ ] **Q04** Due notifications (at Start and on overdue, any priority; Done / Snooze actions) — S — requires Q01, Q02, E01, E03 — [spec](features/Q04-due-notifications.md)
