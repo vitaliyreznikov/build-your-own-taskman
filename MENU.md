@@ -37,7 +37,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **B07** Open note in external editor — S — requires B06
 - [ ] **B08** External-link allowlist — S — requires B06
 - [ ] **B09** Note search across tasks — S — requires A01
-- [ ] **B10** NextAction time model ("back on radar" pointer, sorts rows) — S — requires A02
+- [ ] **B10** NextAction time model ("back on radar" pointer, sorts rows; renamed Start by Q01) — S — requires A02
 - [ ] **B11** File watcher + "changed on disk" update banner — M — requires A01
 - [ ] **B12** Full-page single-task view (level switcher) — M — requires B01, B06
 - [ ] **B13** OS window title follows active view — S — requires B12
@@ -156,3 +156,10 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **P04** `run` verb + "task worker" vs "subagent" naming (so "run I396" reaches the API, not a subagent) — S — requires P02 — [spec](features/P04-run-task-worker-naming.md)
 - [ ] **P05** `rebind-terminal` command (a worker re-labels its tab onto a different existing task; overlay, not rename) — M — requires P01, P02, H08, F09 — [spec](features/P05-rebind-terminal-command.md)
 - [ ] **P06** Control CLI always reachable (`taskman` on PATH in app terminals + unconditional, zero-install invocation) — S — requires P01, P02 — [spec](features/P06-control-cli-always-reachable.md)
+
+## Epic Q — Time-bound tasks  · Start / Due, the Today view, repeating chores
+
+- [ ] **Q01** Start and Due times (rename NextAction → Start, add Due; Start ≤ Due) — M — requires A02, B02, B10 — [spec](features/Q01-start-and-due-times.md)
+- [ ] **Q02** Today view (every task with a Due, grouped by time; Done / Snooze / Skip) — M — requires Q01, B06 — [spec](features/Q02-today-view.md)
+- [ ] **Q03** Repeating time-bound tasks (`Repeat` cron, advance on done/skip/missed, `due-log.jsonl`) — M — requires Q01, Q02 — [spec](features/Q03-repeating-tasks.md)
+- [ ] **Q04** Due notifications (at Start and on overdue, any priority; Done / Snooze actions) — S — requires Q01, Q02, E01, E03 — [spec](features/Q04-due-notifications.md)

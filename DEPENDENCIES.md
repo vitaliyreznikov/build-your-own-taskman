@@ -32,6 +32,8 @@ graph TD
   E --> P[P · Agent-facing control API]
   F --> P
   O --> P
+  B10 --> Q[Q · Time-bound tasks]
+  E --> Q
 ```
 
 **Read it as:** A is the ground floor (everything needs it). B is the UI on top.
@@ -153,6 +155,10 @@ P03: P01, A02, A07
 P04: P02
 P05: P01, P02, H08, F09
 P06: P01, P02
+Q01: A02, B02, B10
+Q02: Q01, B06
+Q03: Q01, Q02
+Q04: Q01, Q02, E01, E03
 ```
 
 ## Build-order guarantee
