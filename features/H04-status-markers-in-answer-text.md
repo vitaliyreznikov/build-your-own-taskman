@@ -41,6 +41,9 @@ And on scanning robustly — the bug that forced whole-message scanning:
   message.
 - The Stop hook shall use a `done`/`attention`/`waiting` marker to set the final
   status, and shall not misread an attention or waiting marker as done.
+- When the Stop hook's input carries the final message text, the Stop hook shall
+  classify from that text and finish well within its hook timeout, never waiting
+  on the transcript file.
 - When no marker is present, the system shall apply the fallbacks defined in H05.
 
 ## Build notes
@@ -51,5 +54,11 @@ And on scanning robustly — the bug that forced whole-message scanning:
 - Stop-hook: prefer an explicit marker; if the marker is `attention`/`waiting`,
   keep that state — do not coerce a stopped turn into `done` just because the
   turn ended. (The done-summary fallback lives in H05.)
+- Read the final message from the Stop payload's `last_assistant_message`, not
+  from the transcript. Claude Code ≥ 2.1.296 appends the final text to the
+  transcript only *after* Stop hooks return, so a hook that polls the transcript
+  for it never sees it and is killed at its timeout — every turn then stays
+  `working` forever. Keep the transcript read only as a fallback for older
+  agents that don't send the field, and cap its wait below the hook timeout.
 - Keep the marker vocabulary exactly aligned with the four card icons (H01) and
   the waiting-vs-attention semantics (H10).
