@@ -60,7 +60,7 @@ carry both, and gives the Today view an unambiguous thing to sort by.
   identifier without migrating those documents would split one concept across two
   names. The rename is of the column and the UI.
 - Snooze (Q02) moves Start and Due together, so it keeps Start ≤ Due by
-  construction. A repeating task's snooze moves only the current occurrence;
-  its Start/Due stay read-only in the task panel (the schedule owns them).
+  construction. A repeating task's snooze holds that occurrence in the
+  log (Q03); its row's Start/Due stay read-only (the schedule owns them).
 - Update agent-facing docs (AGENTS.md, scheduling skill) in the same change:
   agents hand-edit `tasks.md` by column name.

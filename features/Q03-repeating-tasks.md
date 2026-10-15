@@ -23,17 +23,28 @@ moves to DONE by being done — it **advances**:
 - **Missed** → when the *next* occurrence's start arrives while the current one is
   still open, the current one is logged `missed` and the task advances.
 
-The current occurrence is the **latest cron start at or before Due − window**,
-and its **scheduled Due** is that start + window. Without a snooze that is just
-Due − window. A snoozed occurrence (Q02: Start and possibly Due pushed later)
-still resolves to the same cron start, so a snooze never corrupts the schedule.
-Everything keyed by an occurrence uses the scheduled Due: the occurrence log, the
-`each` autorun's "fired" record, and any per-occurrence integration.
+The row's current occurrence is Due − window. An occurrence is identified by its
+**scheduled Due** (cron start + window) everywhere: the occurrence log, the
+`each` autorun's "fired" record, and per-occurrence integrations.
+
+**Held occurrences.** Snoozing an occurrence (Q02) takes it off the row: a
+`snoozed` line in the log gives it its own times, and the row advances to the
+next occurrence without logging an outcome for it.
+
+`{"id":"I621","due":"2026-10-15 11:00","state":"snoozed","newStart":"2026-10-15 15:53","newDue":"2026-10-15 15:53","at":"2026-10-15 14:53"}`
+
+An occurrence is **held** while its latest log line is `snoozed` and its task is
+open and repeating; its Start/Due are that line's `newStart`/`newDue`. A held
+occurrence is shown, notified and acted on like the row's occurrence, but on
+its own: Done/Skip append `done`/`skipped` for its scheduled Due, a further
+snooze appends another `snoozed` line, and it is never logged `missed` — it was
+explicitly moved, so it stays until acted on. Any number of occurrences of one
+task can be held at once.
 
 Every occurrence outcome is appended to **`due-log.jsonl`** at the data root, one
 line each:
 `{"id":"I601","due":"2026-10-11 10:00","state":"done","at":"2026-10-11 09:12"}`
-(`state`: `done` | `skipped` | `missed`). Non-repeating tasks completed with a Due
+(`state`: `done` | `skipped` | `missed` | `snoozed`). Non-repeating tasks completed with a Due
 are logged too.
 
 ## Why it exists
@@ -60,10 +71,16 @@ single Column value cannot hold.
   shall log each, up to a cap, and land on the newest occurrence that has started.
 - When any task that has a Due is moved to DONE, the system shall append a `done`
   line for it.
-- The system shall identify the current occurrence as the latest cron start at
-  or before Due − window, and shall write that occurrence's scheduled Due
-  (start + window), not a snoozed Due, to `due-log.jsonl` and to the `each`
-  autorun record.
+- When an occurrence of a repeating task is snoozed, the system shall append a
+  `snoozed` line (scheduled Due, `newStart`, `newDue`) and, if it was the row's
+  current occurrence, advance the row to the next occurrence without logging an
+  outcome for the snoozed one.
+- While an occurrence's latest log line is `snoozed` and its task is open and
+  repeating, the system shall treat it as an open occurrence with those times,
+  independent of the row and of other held occurrences, and shall never log it
+  `missed`.
+- When a held occurrence is done or skipped, the system shall append `done` /
+  `skipped` with its scheduled Due and leave the row unchanged.
 - The system shall append to `due-log.jsonl`, never rewrite it.
 - While a task repeats, its Autorun shall be either off or **`each`** — launch
   the task's agent terminal at the start of **every** occurrence (K01's countdown,
@@ -81,8 +98,9 @@ single Column value cannot hold.
 ## Build notes
 - The window lives in the Repeat cell, not in the Start/Due gap: Start is
   user-movable (snooze), so a lead derived from it would drift.
-- "Latest cron start ≤ x" needs a backwards search; a forward walk from a
-  widening look-back window over the existing next-occurrence helper is enough.
+- Held occurrences are derived from the append-only log (latest line per
+  (id, due)), so they sync with the data and need no mutable store. Ship them to
+  the UI with the snapshot so badges and the Today view agree.
 - Share the cron parser and "next occurrence" helper with K01 if you built it.
 - The missed check runs in the main process on app start, on every `tasks.md`
   change, and on a timer armed for the earliest next-occurrence start.

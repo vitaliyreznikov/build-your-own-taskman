@@ -24,12 +24,12 @@ Each row shows the due time, task id, title, a 🔁 mark if it repeats (Q03), th
 category, and actions: **✓ Done**, **+1h** (snooze one hour, one click), **⏰
 Snooze** (15 min / 1 h / 3 h / tomorrow 09:00), and **✕ Skip** on repeating
 ones. Snoozing a one-off task moves **both** Start and Due, keeping the gap
-between them. Snoozing a repeating task moves **only the current occurrence**:
-Start = now + duration and Due = the later of its Due and the new Start. The
-schedule is untouched: Done/Skip on the snoozed occurrence advances to the same
-next occurrence it would have without the snooze (Q03 keys the occurrence by its
-scheduled start, not by the stored Due). A snooze that would reach the next
-occurrence's start is refused — skip instead. A row whose Start is
+between them. Snoozing an occurrence of a repeating task **holds** that one
+occurrence (Q03): it gets its own Start = now + duration and Due = the later of
+its Due and the new Start, and the task moves on to its next scheduled
+occurrence. Every occurrence moves independently — a snooze may run past the
+next occurrence's start, and both are then listed, each with its own actions. A
+held occurrence's row names the occurrence it came from ("↷ from 11:00"). A row whose Start is
 still in the future is dimmed and says "starts <time>". Clicking a row opens the
 task's panel. The sidebar entry shows a badge: overdue + due-today count.
 
@@ -47,11 +47,14 @@ the grouping as broken. A windowless repeat is due at its start time; from then
 on it is overdue like anything else. Q04 still announces it as "Now" at that
 moment, and Q03 still logs it `missed` when the next occurrence starts.
 
-**Repeating tasks can be snoozed.** The first version offered only Skip on a
-repeating task, reasoning that its times belong to the schedule. In practice
-"take the medicine, but in an hour" is the common case, and Skip loses the
-occurrence. Snoozing one occurrence is safe because nothing derives the schedule
-from the stored Due (Q03 recovers the occurrence from its scheduled start).
+**Repeating tasks can be snoozed, one occurrence at a time.** The first version
+offered only Skip on a repeating task, reasoning that its times belong to the
+schedule. In practice "do the exercises, but in an hour" is the common case, and
+Skip loses the occurrence. A second version moved the row's Start/Due and
+refused any snooze that reached the next occurrence — so at 14:53 the 10:00
+exercises could not be pushed to 15:53 because 15:00 was next. Holding the
+occurrence outside the row removes that limit: occurrences never share fields,
+so moving one cannot move another.
 
 ## Acceptance criteria (EARS)
 - While any open task's Due is before now, including a repeating task with no
@@ -69,14 +72,12 @@ from the stored Due (Q03 recovers the occurrence from its scheduled start).
   set Start to now + that duration and Due to the new Start plus the previous
   Due − Start gap (zero if Start was empty or after Due).
 - Every row shall offer a one-click **+1h** that snoozes the task by 60 minutes.
-- When the user snoozes a repeating task, the system shall set Start to now +
-  the duration and Due to the later of the current Due and the new Start, and
-  shall change nothing else (Repeat, Autorun, the occurrence log).
-- When a snoozed repeating occurrence is done or skipped, the system shall
-  advance to the next cron occurrence after the occurrence's **scheduled** start,
-  so a snooze never shifts later occurrences.
-- If the new Start of a repeating snooze would be at or after the next
-  occurrence's start, then the system shall refuse the snooze with a message.
+- When the user snoozes an occurrence of a repeating task, the system shall hold
+  that occurrence (Q03) with Start = now + the duration and Due = the later of
+  its Due and the new Start, and shall leave every other occurrence as scheduled.
+- The view shall list each held occurrence as its own row, alongside the task's
+  current occurrence, and ✓ / ✕ / snooze on that row shall act on that
+  occurrence only.
 - When the user clicks a row outside its actions, the system shall open that
   task's panel.
 - The Today entry shall show a badge with the number of listed tasks whose Due is

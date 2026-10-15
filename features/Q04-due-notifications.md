@@ -40,6 +40,8 @@ the app.
 - When the user clicks Snooze 1h, the system shall snooze the task exactly as the
   Today view does (Q02: Start and Due both move); a snoozed task notifies again at
   its new times.
+- The system shall notify a held occurrence (Q03) at its own Start and Due, as a
+  separate notification from the task's current occurrence.
 - When the user clicks Skip on a repeating task's notification, the system shall
   skip the occurrence (Q03).
 - When the user clicks the notification body, the system shall show the window,
