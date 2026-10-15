@@ -21,7 +21,8 @@ and it is the surface the in-app terminals (epic F) are hosted in.
 ## Acceptance criteria (EARS)
 - When the user switches to the single-task level for a task, the system shall
   render that task full-page (its note and controls).
-- When the user switches back, the system shall return to the board.
+- When the user switches back, the system shall return to the view the task was
+  opened from (the board, or e.g. Today or Search), not always the board.
 - The full-page view shall show the same task content as the note panel (B06).
 
 ## Build notes

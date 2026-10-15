@@ -21,11 +21,15 @@ DONE or CLOSED, ordered by Due and grouped:
 | **Done today** | occurrences completed today (collapsed) |
 
 Each row shows the due time, task id, title, a 🔁 mark if it repeats (Q03), the
-category, and actions: **✓ Done**, then **⏰ Snooze** (15 min / 1 h / 3 h /
-tomorrow 09:00) on one-off tasks or **✕ Skip** on repeating ones. Snoozing a
-one-off task moves **both** Start and Due, keeping the gap between them; a
-repeating task has nothing to move — its times come from the schedule — so it
-offers Skip instead. A row whose Start is
+category, and actions: **✓ Done**, **+1h** (snooze one hour, one click), **⏰
+Snooze** (15 min / 1 h / 3 h / tomorrow 09:00), and **✕ Skip** on repeating
+ones. Snoozing a one-off task moves **both** Start and Due, keeping the gap
+between them. Snoozing a repeating task moves **only the current occurrence**:
+Start = now + duration and Due = the later of its Due and the new Start. The
+schedule is untouched: Done/Skip on the snoozed occurrence advances to the same
+next occurrence it would have without the snooze (Q03 keys the occurrence by its
+scheduled start, not by the stored Due). A snooze that would reach the next
+occurrence's start is refused — skip instead. A row whose Start is
 still in the future is dimmed and says "starts <time>". Clicking a row opens the
 task's panel. The sidebar entry shows a badge: overdue + due-today count.
 
@@ -43,6 +47,12 @@ the grouping as broken. A windowless repeat is due at its start time; from then
 on it is overdue like anything else. Q04 still announces it as "Now" at that
 moment, and Q03 still logs it `missed` when the next occurrence starts.
 
+**Repeating tasks can be snoozed.** The first version offered only Skip on a
+repeating task, reasoning that its times belong to the schedule. In practice
+"take the medicine, but in an hour" is the common case, and Skip loses the
+occurrence. Snoozing one occurrence is safe because nothing derives the schedule
+from the stored Due (Q03 recovers the occurrence from its scheduled start).
+
 ## Acceptance criteria (EARS)
 - While any open task's Due is before now, including a repeating task with no
   window, the system shall list it under Overdue and render it as overdue (row,
@@ -58,8 +68,15 @@ moment, and Q03 still logs it `missed` when the next occurrence starts.
 - When the user picks a snooze duration on a non-repeating task, the system shall
   set Start to now + that duration and Due to the new Start plus the previous
   Due − Start gap (zero if Start was empty or after Due).
-- The system shall not offer snooze on a repeating task, and shall reject a
-  snooze request for one.
+- Every row shall offer a one-click **+1h** that snoozes the task by 60 minutes.
+- When the user snoozes a repeating task, the system shall set Start to now +
+  the duration and Due to the later of the current Due and the new Start, and
+  shall change nothing else (Repeat, Autorun, the occurrence log).
+- When a snoozed repeating occurrence is done or skipped, the system shall
+  advance to the next cron occurrence after the occurrence's **scheduled** start,
+  so a snooze never shifts later occurrences.
+- If the new Start of a repeating snooze would be at or after the next
+  occurrence's start, then the system shall refuse the snooze with a message.
 - When the user clicks a row outside its actions, the system shall open that
   task's panel.
 - The Today entry shall show a badge with the number of listed tasks whose Due is

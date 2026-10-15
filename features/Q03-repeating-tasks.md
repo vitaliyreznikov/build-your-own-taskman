@@ -23,8 +23,12 @@ moves to DONE by being done — it **advances**:
 - **Missed** → when the *next* occurrence's start arrives while the current one is
   still open, the current one is logged `missed` and the task advances.
 
-The current occurrence is always Due − window, so snoozing (which moves only
-Start) never corrupts the schedule.
+The current occurrence is the **latest cron start at or before Due − window**,
+and its **scheduled Due** is that start + window. Without a snooze that is just
+Due − window. A snoozed occurrence (Q02: Start and possibly Due pushed later)
+still resolves to the same cron start, so a snooze never corrupts the schedule.
+Everything keyed by an occurrence uses the scheduled Due: the occurrence log, the
+`each` autorun's "fired" record, and any per-occurrence integration.
 
 Every occurrence outcome is appended to **`due-log.jsonl`** at the data root, one
 line each:
@@ -56,6 +60,10 @@ single Column value cannot hold.
   shall log each, up to a cap, and land on the newest occurrence that has started.
 - When any task that has a Due is moved to DONE, the system shall append a `done`
   line for it.
+- The system shall identify the current occurrence as the latest cron start at
+  or before Due − window, and shall write that occurrence's scheduled Due
+  (start + window), not a snoozed Due, to `due-log.jsonl` and to the `each`
+  autorun record.
 - The system shall append to `due-log.jsonl`, never rewrite it.
 - While a task repeats, its Autorun shall be either off or **`each`** — launch
   the task's agent terminal at the start of **every** occurrence (K01's countdown,
@@ -73,6 +81,8 @@ single Column value cannot hold.
 ## Build notes
 - The window lives in the Repeat cell, not in the Start/Due gap: Start is
   user-movable (snooze), so a lead derived from it would drift.
+- "Latest cron start ≤ x" needs a backwards search; a forward walk from a
+  widening look-back window over the existing next-occurrence helper is enough.
 - Share the cron parser and "next occurrence" helper with K01 if you built it.
 - The missed check runs in the main process on app start, on every `tasks.md`
   change, and on a timer armed for the earliest next-occurrence start.

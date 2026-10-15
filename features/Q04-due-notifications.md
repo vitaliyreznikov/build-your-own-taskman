@@ -15,8 +15,8 @@ regardless of priority:
    it has a Start).
 2. **At Due** — "Overdue: <title>", if it is still open.
 
-Each notification offers **Done** and — for one-off tasks — **Snooze 1h**
-(repeating tasks: **Done** and **Skip**) buttons where the OS supports
+Each notification offers **Done** and **Snooze 1h** (repeating tasks: **Done**
+and **Skip**) buttons where the OS supports
 notification actions; clicking the body opens the Today view with the task
 selected. On launch, instead of one banner per already-overdue task, the system
 shows a single summary ("3 overdue, 2 due today").
