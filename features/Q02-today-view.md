@@ -45,7 +45,8 @@ its next occurrence started. In practice that listed yesterday's 12:00 item
 under Today the next morning, next to things due later today, and the user read
 the grouping as broken. A windowless repeat is due at its start time; from then
 on it is overdue like anything else. Q04 still announces it as "Now" at that
-moment, and Q03 still logs it `missed` when the next occurrence starts.
+moment, and it stays on the row, overdue, until it is done, skipped or
+snoozed (Q03 never advances it on its own).
 
 **Repeating tasks can be snoozed, one occurrence at a time.** The first version
 offered only Skip on a repeating task, reasoning that its times belong to the
