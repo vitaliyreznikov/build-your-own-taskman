@@ -31,7 +31,12 @@ occurrence. Every occurrence moves independently — a snooze may run past the
 next occurrence's start, and both are then listed, each with its own actions. A
 held occurrence's row names the occurrence it came from ("↷ from 11:00"). A row whose Start is
 still in the future is dimmed and says "starts <time>". Clicking a row opens the
-task's panel. The sidebar entry shows a badge: overdue + due-today count.
+task's panel. The sidebar entry shows a badge: the **overdue** count only.
+
+**The badge counts overdue only.** It first counted overdue + due later today.
+With a day of chores that read as a permanent "20" that never meant "act now",
+so the user stopped looking at it. Counting only what is already late makes it
+0 most of the time and a real signal when it isn't.
 
 ## Why it exists
 Priority-ranked Kanban boards are the wrong lens for things that must happen at a
@@ -81,8 +86,8 @@ so moving one cannot move another.
   occurrence only.
 - When the user clicks a row outside its actions, the system shall open that
   task's panel.
-- The Today entry shall show a badge with the number of listed tasks whose Due is
-  in the past or later today; with zero it shall show no badge.
+- The Today entry shall show a badge with the number of listed occurrences that
+  are overdue (Due ≤ now); with zero it shall show no badge.
 - The view and badge shall update when `tasks.md` changes on disk and when the
   clock crosses a task's Due, without a restart.
 
