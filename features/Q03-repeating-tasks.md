@@ -37,7 +37,12 @@ next occurrence without logging an outcome for it.
 
 `{"id":"I621","due":"2026-10-15 11:00","state":"snoozed","newStart":"2026-10-15 15:53","newDue":"2026-10-15 15:53","at":"2026-10-15 14:53"}`
 
-An occurrence is **held** while its latest log line is `snoozed` and its task is
+A `held` line has the same shape and meaning as `snoozed` — the occurrence is
+taken off the row on its own times — but records that the system, not the user,
+moved it aside (an extension that must advance the row while an occurrence is
+still open, e.g. one that reminds someone at every occurrence).
+
+An occurrence is **held** while its latest log line is `snoozed` or `held` and its task is
 open and repeating; its Start/Due are that line's `newStart`/`newDue`. A held
 occurrence is shown, notified and acted on like the row's occurrence, but on
 its own: Done/Skip append `done`/`skipped` for its scheduled Due, a further
@@ -47,7 +52,7 @@ task can be held at once.
 Every occurrence outcome is appended to **`due-log.jsonl`** at the data root, one
 line each:
 `{"id":"I601","due":"2026-10-11 10:00","state":"done","at":"2026-10-11 09:12"}`
-(`state`: `done` | `skipped` | `missed` | `snoozed`). Non-repeating tasks completed with a Due
+(`state`: `done` | `skipped` | `missed` | `snoozed` | `held`). Non-repeating tasks completed with a Due
 are logged too. `missed` stays a valid state for history (older logs carry it,
 from the automatic catch-up this feature used to do — see below), but the
 system no longer writes it.
