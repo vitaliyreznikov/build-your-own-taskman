@@ -148,6 +148,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **O12** ⭐ Subgoal-to-subgoal dependency blockers — M — requires O03, O06 — [spec](features/O12-subgoal-dependency-blockers.md)
 - [ ] **O13** Subgoal title vs description (the row is the title) — S — requires O03, O06 — [spec](features/O13-subgoal-title-and-description.md)
 - [ ] **O14** ⭐ PR blocker carries live state + merge order (`after`) — M — requires O03, O06, O07, L01 — [spec](features/O14-pr-state-and-merge-order.md)
+- [ ] **O15** Subgoal dates in the tree + sort by date — S — requires O10, K02 — [spec](features/O15-subgoal-dates-and-sort.md)
 
 ## Epic P — Agent-facing control API  · a first-class way for agents to act on the board
 
