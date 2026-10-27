@@ -42,8 +42,12 @@ click.
 - The system shall persist stars and the "★ Starred" toggle locally across
   restarts; stars are keyed by the tmux session name, so a terminal recreated by
   F14 restore keeps its star.
-- When the user closes a tab (killing its session), the system shall drop its
-  star.
+- When the user right-clicks a terminal tab in a task's own terminal strip (the
+  task panel's Terminal tab), the system shall show the same Star / Unstar menu,
+  and the tab shall show the same ★ marker — it is one star per session, shared
+  with the main strip.
+- When the user closes a tab (killing its session), from either strip, the system
+  shall drop its star.
 - When the last starred terminal is unstarred or closed, the system shall turn
   the "★ Starred" mode off, so the strip never goes empty because of it.
 - Starring shall not create, rename, kill or restart any tmux session.
@@ -58,5 +62,7 @@ click.
 - The visible-set predicate becomes
   `starredOnly ? starred.has(name) : !hiddenCategories.has(category(t))`; keep
   one predicate so the strip, attention cycle and re-homing can't disagree.
+- Share one tab-menu component between the main strip and the task panel's strip
+  so the two can't drift.
 - A small positioned menu at the cursor is enough (close on outside click or
   Escape); no native menu needed.
