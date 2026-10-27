@@ -162,6 +162,7 @@ Q01: A02, B02, B10
 Q02: Q01, B06
 Q03: Q01, Q02
 Q04: Q01, Q02, E01, E03
+Q05: Q02, Q04, O03, O15
 ```
 
 ## Build-order guarantee

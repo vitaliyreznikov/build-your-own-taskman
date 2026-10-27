@@ -166,3 +166,4 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **Q02** Today view (every task with a Due, grouped by time; Done / Snooze / Skip) — M — requires Q01, B06 — [spec](features/Q02-today-view.md)
 - [ ] **Q03** Repeating time-bound tasks (`Repeat` cron, ✓/✕ step one occurrence at a time, no auto-missed, `due-log.jsonl`, `each` autorun per occurrence) — M — requires Q01, Q02 — [spec](features/Q03-repeating-tasks.md)
 - [ ] **Q04** Due notifications (at Start and on overdue, any priority; Done / Snooze actions) — S — requires Q01, Q02, E01, E03 — [spec](features/Q04-due-notifications.md)
+- [ ] **Q05** Subgoal Due (v2 subgoals with a deadline in Today; ✓ / snooze, badge, overdue notification) — M — requires Q02, Q04, O03, O15 — [spec](features/Q05-subgoal-due.md)
