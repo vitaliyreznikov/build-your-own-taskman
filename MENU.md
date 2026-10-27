@@ -47,6 +47,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **B17** Board picker modal on new-task "+" (choose job/personal/brootto/…) — S — requires B04, A05, A13 — [spec](features/B17-board-picker-on-new-task.md)
 - [ ] **B18** Board picker on the terminal-strip "+" (same modal as B17; fixes silent create onto a F20-hidden board) — S — requires B17, F13, F20 — [spec](features/B18-board-picker-on-terminal-plus.md)
 - [ ] **B19** Search as its own page (sidebar box → full-width results page; click opens the task from any view) — S — requires B09, B12 — [spec](features/B19-search-page.md)
+- [ ] **B20** Compact task panel — essentials on top, rarely-used controls below the content — S — requires B06, B05, O06 — [spec](features/B20-compact-task-panel.md)
 
 ## Epic C — Boards / views / filters
 
