@@ -167,3 +167,4 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **Q03** Repeating time-bound tasks (`Repeat` cron, ✓/✕ step one occurrence at a time, no auto-missed, `due-log.jsonl`, `each` autorun per occurrence) — M — requires Q01, Q02 — [spec](features/Q03-repeating-tasks.md)
 - [ ] **Q04** Due notifications (at Start and on overdue, any priority; Done / Snooze actions) — S — requires Q01, Q02, E01, E03 — [spec](features/Q04-due-notifications.md)
 - [ ] **Q05** Subgoal Due (v2 subgoals with a deadline in Today; ✓ / snooze, badge, overdue notification) — M — requires Q02, Q04, O03, O15 — [spec](features/Q05-subgoal-due.md)
+- [ ] **Q06** Today ★ marker (a row whose task/subgoal has a starred open terminal shows ★ = in progress) — S — requires Q02, Q05, F22, O09 — [spec](features/Q06-today-starred-marker.md)
