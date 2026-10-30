@@ -72,6 +72,13 @@ turns "don't reboot, you'll lose the terminals" into a button.
   directory, left-to-right position, and the Claude session a restore should resume.
 - The snapshot shall be the single source of the terminal tab order, and the app
   shall order the tabs by it on startup.
+- The system shall record which terminal each agent session ran in, and the
+  session a terminal resumes shall be one attributable to that terminal — never a
+  sibling terminal's of the same task, and never the same session for two
+  terminals. Where no session can be attributed to a terminal, the system shall
+  restore it as a plain terminal.
+- The system shall not record non-interactive agent runs (e.g. `claude -p`
+  launched from inside a terminal) as the terminal's or the task's sessions.
 - Because agent session history is keyed by working directory, the system shall
   record the directory the resumable session ran in, and shall start a restored
   terminal in that directory so the resume finds the conversation.
