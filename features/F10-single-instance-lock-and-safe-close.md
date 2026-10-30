@@ -12,7 +12,9 @@ Two protections for the terminal lifecycle. First, the app enforces a single
 running instance — a second launch focuses the existing window rather than
 starting a rival process. Second, closing a terminal tab is guarded: if Claude
 is running in that terminal, the app refuses and tells the user to *"exit from
-claude first"* rather than killing a live agent.
+claude first"* rather than killing a live agent. The message carries a
+**Close anyway** action, so a deliberate close is one more click instead of a
+trip into the terminal to type `/exit`.
 
 ## Why it exists
 Terminals hold running agents; an accidental kill loses work. Both mechanisms
@@ -23,6 +25,8 @@ machinery after losing tabs that way.
 
 > *"prohibit closing session via 'x' if claude is running. Say to user 'exit from
 > claude first'."*
+> *"I can't close one terminal - it says exit from claude first"* → *"yes close
+> anyway makes sense"* (the guard stays; an explicit override is added).
 > *"we should not allow second instance to run — only one instance. Remove
 > reconciliation."*
 
@@ -31,6 +35,12 @@ machinery after losing tabs that way.
   focus the already-running instance's window instead.
 - When the user attempts to close a terminal tab while Claude is running in it,
   the system shall block the close and instruct the user to exit Claude first.
+- While that message is shown, it shall offer a **Close anyway** action; when the
+  user chooses it, the system shall close the tab and kill its session exactly
+  as an ordinary close does (including dropping the tab's star, F22).
+- The block message with its action shall stay visible long enough to click
+  (several seconds, longer than a plain notice) and shall not close the tab on
+  its own when it times out or is dismissed.
 - When no agent is running in a terminal, the user shall be able to close its tab
   normally.
 - On detach (closing the view without closing the tab), the system shall keep the
@@ -45,3 +55,6 @@ machinery after losing tabs that way.
 - Back the close-guard with an `isClaudeRunning` check on the terminal's session
   (inspect the running process in the tmux pane); only that state blocks the
   close.
+- Close anyway is a plain session kill, not a scripted `/exit`: the agent's
+  conversation is already persisted by the agent itself and stays resumable from
+  the task's session history.
