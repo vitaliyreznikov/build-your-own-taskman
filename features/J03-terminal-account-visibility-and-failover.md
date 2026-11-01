@@ -76,7 +76,7 @@ could have taken it.
 - Subgoal titles for the hover text come from the task's document. Read it
   lazily on first hover and cache it briefly, rather than loading every
   document up front.
-- **Source of truth for the chip is the hook**, not tmux. Claude Code's lifecycle
+- **Source of truth for the tag is the hook**, not tmux. Claude Code's lifecycle
   hooks (H03) run inside the Claude process, so they see its real
   `CLAUDE_CONFIG_DIR` — including one exported by hand in the shell, which
   `tmux show-environment` cannot see. Add `configDir` ('' = default dir) to the
