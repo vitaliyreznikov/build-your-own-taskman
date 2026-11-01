@@ -10,9 +10,10 @@ novel: true
 ## What
 Builds on J02's two Claude accounts:
 
-- **Live account tag in the window title.** The app's window title ends with
+- **Live account tag in the window title.** The app's window title starts with
   the active terminal's account tag, e.g.
-  `Taskman — I244: Improve Taskman · terminal [W]`. The tab labels stay short
+  `Taskman [W] — I244: Improve Taskman · terminal`. It goes at the front
+  because macOS truncates a long title at the end, which would hide the tag. The tab labels stay short
   and carry no tag: users keep many terminals open, and a tag on every tab
   widens the strip. The tag reflects the account the running Claude *actually*
   uses, as Claude reports it through the status hook. That covers terminals
@@ -41,9 +42,9 @@ could have taken it.
 
 ## Acceptance criteria (EARS)
 - Where two or more accounts are configured, while the terminal view shows a
-  terminal, the system shall end the window title with the short tag of that
-  terminal's account (`… · terminal [W]`), and shall not add the tag to the tab
-  labels.
+  terminal, the system shall put the short tag of that terminal's account at
+  the start of the window title (`Taskman [W] — …`), so truncation of a long
+  title never hides it, and shall not add the tag to the tab labels.
 - The account shown shall be the one the terminal's Claude session reports
   through its lifecycle hook, while a session is reporting.
 - When no Claude session is reporting in a terminal, the system shall use the
