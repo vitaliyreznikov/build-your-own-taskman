@@ -10,13 +10,15 @@ novel: true
 ## What
 Builds on J02's two Claude accounts:
 
-- **Live account tag in the label.** Every Claude terminal tab's label ends
-  with its account's short tag, e.g. `I244 [W]` or `I244·g1_2 [P]`. The tag
-  reflects the account the running Claude *actually* uses, as Claude reports it
-  through the status hook. That covers terminals opened before J02 and
-  terminals switched by hand (`export CLAUDE_CONFIG_DIR=…`). When no Claude is
-  running, the tag falls back to the account the terminal was launched with.
-  No chip, no colour.
+- **Live account tag in the window title.** The app's window title ends with
+  the active terminal's account tag, e.g.
+  `Taskman — I244: Improve Taskman · terminal [W]`. The tab labels stay short
+  and carry no tag: users keep many terminals open, and a tag on every tab
+  widens the strip. The tag reflects the account the running Claude *actually*
+  uses, as Claude reports it through the status hook. That covers terminals
+  opened before J02 and terminals switched by hand
+  (`export CLAUDE_CONFIG_DIR=…`). When no Claude is running, the tag falls back
+  to the account the terminal was launched with.
 - **Hover details.** The tab's hover text puts one fact per line: the task id
   and title, the subgoal id and title (for a subgoal terminal), the Claude
   account, then the agent status.
@@ -40,9 +42,12 @@ exhausted account just stalls on Claude's limit message, when the other account
 could have taken it.
 
 ## Acceptance criteria (EARS)
-- Where two or more accounts are configured, while a Claude session runs in a
-  terminal, the system shall append to that terminal's tab label the short tag
-  of the account the session reports through its lifecycle hook (`I244 [W]`).
+- Where two or more accounts are configured, while the terminal view shows a
+  terminal, the system shall end the window title with the short tag of that
+  terminal's account (`… · terminal [W]`), and shall not add the tag to the tab
+  labels.
+- The account shown shall be the one the terminal's Claude session reports
+  through its lifecycle hook, while a session is reporting.
 - When no Claude session is reporting in a terminal, the system shall use the
   account the terminal was launched under, if known, and append no tag
   otherwise.
