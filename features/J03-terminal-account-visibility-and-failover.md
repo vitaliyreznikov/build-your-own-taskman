@@ -10,12 +10,16 @@ novel: true
 ## What
 Builds on J02's two Claude accounts:
 
-- **Live account chip.** Every Claude terminal tab shows which account the
-  running Claude *actually* uses, as reported by Claude itself through the
-  status hook. That covers terminals opened before J02 and terminals switched by
-  hand (`export CLAUDE_CONFIG_DIR=…`). Each account has its own chip colour.
-  When no Claude is running, the chip falls back to the account the terminal
-  was launched with.
+- **Live account tag in the label.** Every Claude terminal tab's label ends
+  with its account's short tag, e.g. `I244 [W]` or `I244·g1_2 [P]`. The tag
+  reflects the account the running Claude *actually* uses, as Claude reports it
+  through the status hook. That covers terminals opened before J02 and
+  terminals switched by hand (`export CLAUDE_CONFIG_DIR=…`). When no Claude is
+  running, the tag falls back to the account the terminal was launched with.
+  No chip, no colour.
+- **Hover details.** The tab's hover text puts one fact per line: the task id
+  and title, the subgoal id and title (for a subgoal terminal), the Claude
+  account, then the agent status.
 - **Move to another account.** Right-clicking a tab offers "Move to <account>"
   for each other account. It works only while that terminal's Claude is idle.
   It exits Claude, switches the terminal's account, and resumes the same
@@ -37,12 +41,15 @@ could have taken it.
 
 ## Acceptance criteria (EARS)
 - Where two or more accounts are configured, while a Claude session runs in a
-  terminal, the system shall show on that terminal's tab the account the
-  session reports through its lifecycle hook.
-- When no Claude session is reporting in a terminal, the system shall show the
-  account the terminal was launched under, if known, and no chip otherwise.
-- The system shall give each configured account a distinct chip colour, and
-  name the account in the chip's tooltip.
+  terminal, the system shall append to that terminal's tab label the short tag
+  of the account the session reports through its lifecycle hook (`I244 [W]`).
+- When no Claude session is reporting in a terminal, the system shall use the
+  account the terminal was launched under, if known, and append no tag
+  otherwise.
+- When the user hovers over a terminal tab, the system shall show, each on its
+  own line, the task id and title, the subgoal id and title (subgoal terminals
+  only), the Claude account name (noting when it is only the launch account),
+  and the agent status.
 - When the user right-clicks a terminal tab and two or more accounts are
   configured, the system shall offer to move the terminal to each account other
   than its current one.
@@ -66,12 +73,16 @@ could have taken it.
   explicitly.
 
 ## Build notes
+- Subgoal titles for the hover text come from the task's document. Read it
+  lazily on first hover and cache it briefly, rather than loading every
+  document up front.
 - **Source of truth for the chip is the hook**, not tmux. Claude Code's lifecycle
   hooks (H03) run inside the Claude process, so they see its real
   `CLAUDE_CONFIG_DIR` — including one exported by hand in the shell, which
   `tmux show-environment` cannot see. Add `configDir` ('' = default dir) to the
   per-terminal status entry the hook already writes. The app maps it to an
-  account by comparing normalised paths. The status entry is cleared when
+  account by comparing normalised paths. An account's tag comes from config
+  (`tag`), else the first letter of its name. The status entry is cleared when
   Claude exits, which is exactly when the fallback (J02's launch record) should
   take over.
 - **Move = exit + resume.** A running Claude can't change accounts. Send
