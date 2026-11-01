@@ -1,7 +1,7 @@
 ---
 id: J03
 epic: J — Claude account usage
-title: Live account per terminal, move between accounts, account filter, quota failover
+title: Live account per terminal, move between accounts, quota failover
 size: M
 requires: [J02, H03, F22]
 novel: true
@@ -26,8 +26,6 @@ Builds on J02's two Claude accounts:
   for each other account. It works only while that terminal's Claude is idle.
   It exits Claude, switches the terminal's account, and resumes the same
   conversation on the new account.
-- **Account filter.** The sidebar Terminals section can show only the
-  terminals on one account.
 - **Quota failover at launch.** When a terminal starts and the account the rule
   picked is out of quota while another account still has headroom, the terminal
   starts on the other account instead, and says so.
@@ -64,8 +62,6 @@ could have taken it.
   the new account for restore.
 - If the terminal's Claude is busy (working or waiting on a permission prompt)
   when a move is chosen, then the system shall refuse the move and say why.
-- Where two or more accounts are configured, the system shall let the user
-  filter the sidebar's terminal list to the terminals on one account.
 - When the system launches a Claude terminal without an explicit account pick,
   and the account selected by J02's rule has a usage window at or above the
   failover threshold, the system shall launch on the first other configured
