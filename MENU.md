@@ -123,6 +123,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 ## Epic J — Claude account usage
 
 - [ ] **J01** Claude usage-limit widget (5h + weekly, pace-relative) — M — requires B01 — [spec](features/J01-claude-usage-limit-widget.md)
+- [ ] **J02** ⭐ Two Claude accounts — per-category default, per-terminal override, both limits shown — M — requires J01, A14, F12, F14, I02 — [spec](features/J02-two-claude-accounts.md)
 
 ## Epic K — Scheduled autorun
 
