@@ -12,9 +12,11 @@ Any terminal tab can be **starred** from its right-click menu ("☆ Star" /
 "★ Unstar"). A starred tab shows a small ★ before its label; an unstarred tab
 shows nothing extra, so the strip spends no space on the feature until it is
 used. The sidebar's **Terminals** filter (F20) gets a **★ Starred** toggle at its
-top: when it is on, the strip shows only starred terminals, from **every**
-category — including categories the F20 filter hides. When it is off, the strip
-is exactly the F20 strip.
+top. It **combines** with the category checkboxes: when it is on, the strip
+shows every starred terminal (from any category, including ones the F20 filter
+hides) **plus** every terminal of the checked categories — so "★ Starred +
+brootto" shows the starred tabs and all brootto tabs. Starred alone = turn it on
+and uncheck every category. When it is off, the strip is exactly the F20 strip.
 
 ## Why it exists
 Terminals are spread across categories (bolt, personal, brootto…), and the F20
@@ -34,8 +36,12 @@ click.
   unstarred tabs.
 - While at least one terminal is starred, the system shall show a "★ Starred"
   toggle with the starred count at the top of the sidebar's Terminals section.
-- While "★ Starred" is on, the system shall show in the strip exactly the starred
-  terminals, regardless of the F20 hidden categories.
+- While "★ Starred" is on, the system shall show in the strip every starred
+  terminal regardless of the F20 hidden categories, plus every terminal whose
+  category is checked (union).
+- While "★ Starred" is on, the category checkboxes shall stay enabled.
+  *(Amended 2026-11-04: "★ Starred" used to override and disable them — the user
+  asked to pick "starred + something".)*
 - While "★ Starred" is off, the system shall show the strip as F20 defines it.
 - The Tab-key "next attention" cycle, the "needs you" jump and the
   hidden-active-terminal re-homing shall use the same visible set as the strip.
@@ -60,7 +66,7 @@ click.
   reboots, and the star should survive a restore. Drop it only on the explicit
   close (×).
 - The visible-set predicate becomes
-  `starredOnly ? starred.has(name) : !hiddenCategories.has(category(t))`; keep
+  `(starredOn && starred.has(name)) || !hiddenCategories.has(category(t))`; keep
   one predicate so the strip, attention cycle and re-homing can't disagree.
 - Share one tab-menu component between the main strip and the task panel's strip
   so the two can't drift.
