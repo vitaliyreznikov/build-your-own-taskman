@@ -93,6 +93,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **F20** Filter terminal tabs by board (sidebar checkboxes hide a board's terminals) — S — requires F06, A05 — [spec](features/F20-terminal-board-filter.md)
 - [ ] **F21** Persistent default terminal provider (Claude or Codex) — M — requires F12 — [spec](features/F21-default-terminal-provider.md)
 - [ ] **F22** Starred terminals (right-click star; sidebar "★ Starred" shows them across categories) — S — requires F20 — [spec](features/F22-starred-terminals.md)
+- [ ] **F23** ⭐ Hibernate idle agent terminals (💤 tab stays; view wakes the same conversation; reboot restore comes back asleep) — M — requires F14, H08, I01, J03 — [spec](features/F23-hibernate-idle-terminals.md)
 
 ## Epic G — Prompt-parts library
 
