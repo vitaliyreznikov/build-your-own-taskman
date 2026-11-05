@@ -41,13 +41,18 @@ user's place; hibernating frees the memory and keeps both.
 
 ## Acceptance criteria (EARS)
 - The system shall consider a terminal **safe to hibernate** only while all hold:
-  its foreground process is Claude; its agent status is absent or `done` (never
-  `working`, `waiting`, `attention` or `approval`); the agent's conversation id is
-  known; the agent's input box is visible and holds no typed text (a dimmed
+  its foreground process is Claude; its agent status is absent, `done`, or
+  `attention` (never `working`, `waiting` or `approval`); the agent's conversation
+  id is known; the agent's input box is visible and holds no typed text (a dimmed
   auto-suggestion does not count as text); and the agent shows no running
   background task.
 - The system shall consider a terminal **idle** when neither its pane output nor
   the user's viewing of it has happened within the threshold.
+- While a terminal's agent waits for the user (`attention`), the system shall
+  require the longer attention threshold (default 24 hours) instead, and shall
+  keep the question with the record so the tab shows 💤⚠️ and its hover text
+  repeats the question. *(The user: an unanswered question loses nothing on
+  resume — the conversation still holds it.)*
 - While automatic hibernation is enabled, the system shall periodically hibernate
   every terminal that is safe and idle past the configured threshold (default
   3 hours), one at a time.
@@ -74,13 +79,19 @@ user's place; hibernating frees the memory and keeps both.
   and wake each on first view.
 - When a terminal is closed (killed), the system shall drop its record.
 - The system shall keep hibernation records and settings machine-local (never
-  synced): `enabled` and `idleHours`, defaulting to on and 3.
+  synced): `enabled`, `idleHours` and `attentionHours`, defaulting to on, 3
+  and 24.
 
 ## Build notes
 - **Idle signal:** tmux's `#{session_activity}` (epoch seconds of the last pane
   output) — an idle Claude at its prompt prints nothing. Combine with a
   renderer-reported "last viewed" time per session (the renderer pings on every
   view, which also serves as the wake trigger).
+- **Conversation id:** Claude Code keeps a per-process record
+  `<configDir>/sessions/<pid>.json` (`sessionId`, `cwd`) from the moment it starts;
+  prefer it, then the status hook's id, then a `--resume <id>` in the process's
+  arguments (older builds wrote no record). The hook alone misses every terminal
+  restored after a reboot and not touched since — in practice most of them.
 - **Empty input box:** `capture-pane -e -p`, find the last line starting with `❯`
   and the lines up to the box's bottom border; any visible character outside a
   dim (SGR 2) span is a draft → not safe. No `❯` line (a dialog, a permission
@@ -93,5 +104,5 @@ user's place; hibernating frees the memory and keeps both.
 - MCP servers are children of the agent process, so they exit with it — that is
   most of the saving.
 - Records: `.hibernated.json` `{ "<session>": { sessionId, cwd, at } }`;
-  settings: `.hibernate.json` `{ enabled, idleHours }`. Prune records whose session
+  settings: `.hibernate.json` `{ enabled, idleHours, attentionHours }`. Prune records whose session
   is gone at startup.
