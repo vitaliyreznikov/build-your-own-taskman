@@ -78,6 +78,11 @@ user's place; hibernating frees the memory and keeps both.
   each one hibernated in its conversation's directory, with no agent started,
   and wake each on first view.
 - When a terminal is closed (killed), the system shall drop its record.
+- The system shall record in the F14 snapshot each terminal's **own**
+  conversation — its hibernation record, else its status entry — and fall back
+  to the task's newest conversation only for a terminal that never reported one.
+  *(Amended 2026-11-05: the per-task fallback alone resumed all 19 terminals of
+  one task into the same conversation after a reboot.)*
 - The system shall keep hibernation records and settings machine-local (never
   synced): `enabled`, `idleHours` and `attentionHours`, defaulting to on, 3
   and 24.
