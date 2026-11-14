@@ -87,3 +87,6 @@ tells you something".
 - This is the reference implementation's choice of transport. Any agent with a
   peer-messaging / inbox mechanism works the same way; without one, fall back to
   the notification.
+- **Log each delivery** (`[deliver]`): target session, account, and outcome
+  (`SENT <peer>` / no live session / failure reason), so a delivery can be
+  audited after the fact — the success notification is gone by morning.

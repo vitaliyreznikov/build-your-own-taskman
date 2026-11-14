@@ -228,3 +228,10 @@ prompt).
   rows.
 - **Not in scope:** subgoal-level arming (a `monitor` blocker kind in a v2
   document), and acting on *resolve*. Both fit the same poller later.
+- **Log every decision** to the app log with a `[monitor]` prefix: the first
+  check of a reference (baseline), a catch-up window longer than a few minutes,
+  each check that finds new incidents (reference, incident starts, armed tasks),
+  every ok↔error transition with the error text, and what each queued fire
+  ended as (agent started / delivered into a live session / delivery failed →
+  notified / cancelled / dropped because the task closed). The status file only
+  holds the latest state, so the log is the only overnight history.
