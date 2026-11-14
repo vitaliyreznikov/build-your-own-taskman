@@ -164,6 +164,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **P04** `run` verb + "task worker" vs "subagent" naming (so "run I396" reaches the API, not a subagent) — S — requires P02 — [spec](features/P04-run-task-worker-naming.md)
 - [ ] **P05** `rebind-terminal` command (a worker re-labels its tab onto a different existing task; overlay, not rename) — M — requires P01, P02, H08, F09 — [spec](features/P05-rebind-terminal-command.md)
 - [ ] **P06** Control CLI always reachable (`taskman` on PATH in app terminals + unconditional, zero-install invocation) — S — requires P01, P02 — [spec](features/P06-control-cli-always-reachable.md)
+- [ ] **P07** Local web reports (script-backed HTML pages on the app's loopback server, recomputed on every F5) — M — requires P01 — [spec](features/P07-local-web-reports.md)
 
 ## Epic Q — Time-bound tasks  · Start / Due, the Today view, repeating chores
 
