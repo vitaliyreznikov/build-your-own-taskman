@@ -135,6 +135,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 ## Epic L — PR-review blocking
 
 - [ ] **L01** ⭐ Block a task on PR review, watch for reviews, auto-resume the agent — L — requires F12, E01, H07 — [spec](features/L01-pr-review-blocking.md)
+- [ ] **L02** Run a task when a monitor (by ID) fires — `runs-on-alert` relation, Prometheus/vmalert `ALERTS` or Grafana rule UID, K01 countdown — M — requires L01, K01, D04 — [spec](features/L02-run-task-when-monitor-fires.md)
 
 ## Epic O — Structured task documents (v2)
 

@@ -1,0 +1,189 @@
+---
+id: L02
+epic: L — PR-review blocking
+title: Run a task when a monitor (by ID) fires
+size: M
+requires: [L01, K01, D04]
+novel: false
+---
+
+## What
+A task can be **armed on an alerting monitor**: when that monitor starts firing,
+the app launches the task's agent terminal — the same cancelable K01 countdown,
+the same F12 auto-start — with an extra prompt that names the alert. It is L01's
+"wait on an external thing, wake the agent when it happens" applied to a monitor
+instead of a pull request.
+
+The trigger is a `runs-on-alert` row in the git-synced `relations.md` (D04 —
+just another relation type), where `To` is a **monitor reference**:
+
+```
+| From | Type          | To                                         |
+|------|---------------|--------------------------------------------|
+| I665 | runs-on-alert | vm:DialTcpIssues{env="production"}         |
+| I700 | runs-on-alert | grafana:vmsingle-readonly-14d              |
+| I701 | runs-on-alert | dd:12345678                                |
+```
+
+A reference is `<source>:<id>`. `<source>` names an entry in a **machine-local
+source list**; `<id>` is whatever that kind of source calls a monitor:
+
+| source `type` | `<id>` is | "firing" means |
+|---|---|---|
+| `prometheus` — any Prometheus-compatible query API (Prometheus, VictoriaMetrics, a Grafana datasource proxy in front of either) | an alert rule name, optionally followed by PromQL label matchers `{k="v",…}` | the `ALERTS{alertname="<id>",alertstate="firing",…}` series exists (Prometheus and vmalert both write it) |
+| `grafana` — Grafana-managed alerting | the alert rule **UID** | the rule's state is `firing` (`alerting`) |
+| `datadog` (optional) | the numeric monitor ID | `overall_state` is `Alert` |
+
+The source list lives in `.monitor-sources.json` next to the data (gitignored —
+it holds hostnames and the way to fetch a credential, never the credential):
+
+```json
+{
+  "sources": {
+    "vm":      { "type": "prometheus", "url": "https://grafana.example.com/api/datasources/proxy/uid/victoriametrics",
+                 "tokenCmd": "security find-generic-password -s grafana.example.com -w" },
+    "grafana": { "type": "grafana", "url": "https://grafana.example.com",
+                 "tokenCmd": "security find-generic-password -s grafana.example.com -w" },
+    "dd":      { "type": "datadog", "site": "datadoghq.com",
+                 "apiKeyCmd": "…", "appKeyCmd": "…" }
+  }
+}
+```
+
+`tokenCmd` is a shell command whose stdout is the bearer token (a keychain
+lookup, a password-manager CLI); the app runs it when it needs the token and
+never writes the result anywhere.
+
+### Firing = an incident, and each incident fires once
+The app polls every armed reference on a short interval (default **60 s**) for
+as long as it is running — **focused or not**. Unlike L01's review poll this is
+not focus-gated: the reason to arm on a monitor is usually that the incident
+happens when nobody is looking (a 03:00 brownout whose state must be captured
+while it lasts).
+
+A reference's **incident** is identified by when it started firing (the alert's
+`activeAt`, or the moment the poll first saw it firing when the source gives no
+start time). The app reacts on the **edge** — a new incident — never on the
+level, so a monitor that keeps firing for an hour launches one agent, not sixty.
+After it resolves, the next time it fires is a new incident and fires again.
+The row stays armed until a human (or an agent) deletes it.
+
+**Baseline on first sight:** a reference seen for the first time *already
+firing* is recorded as handled, not fired — arming means "the *next* time it
+fires". (The status view shows it as firing, so you can still run the task by
+hand.)
+
+### The reaction
+For each armed task not in DONE/CLOSED:
+
+1. Enqueue it on the **K01 autorun queue** with the usual ~15 s cancelable
+   countdown (notification + in-app banner). Several monitors firing at once
+   launch one terminal at a time, exactly like overdue autoruns.
+2. If the task already has a live terminal → a desktop notification ("🚨
+   DialTcpIssues firing — I665"), no second agent (K01's existing rule).
+3. Otherwise open the task's terminal (F12 + F09 IN PROGRESS) and append an
+   extra prompt in the same submission:
+
+   > Monitor `vm:DialTcpIssues{env="production"}` started firing at 03:12
+   > (labels: env=production, severity=page, …). This task is armed to run when
+   > it fires: do the time-sensitive part now, while it is still firing, then
+   > report what you found. Ask me for approval before changing anything.
+
+4. Append a `{"kind":"monitor", …}` line to the task's `timeline.jsonl` if it is a
+   v2 task (O05), naming the reference and the incident start.
+
+Cancelling the countdown skips **this incident** only; the row stays armed.
+
+### State and UI
+- **`.monitor-status.json`** (machine-local, gitignored, like `.pr-status.json`):
+  per reference — `state` (`firing` | `ok` | `error`), current `activeAt`,
+  labels of the firing series, `checkedAt`, `handledActiveAt` (the last incident
+  already reacted to), and `error` text. `handledActiveAt` is what makes an app
+  relaunch mid-incident not fire twice.
+- The **PRs view gains a "Monitors" section**: every `runs-on-alert` row with its
+  task, reference, live state badge (🚨 firing since … / ✅ ok / ⚠️ error), last
+  checked; an **add** control (task + reference), **remove** per row, and **Check
+  now**. A reference whose source name is not in `.monitor-sources.json` shows
+  as an error naming the missing source.
+
+## Why it exists
+L01 made one external wait — a PR review — visible and self-resuming. The other
+recurring wait in ops work is **"run this when the thing happens again"**:
+capture DNS/conntrack state during the next brownout, grab a heap profile the
+next time memory alerts, re-check a fix the next time the page fires. Without a
+trigger the human has to be awake, notice the page, remember which task wanted
+it, and open it — and the window has usually closed by then. Arming the task on
+the monitor's own ID makes the alert itself start the investigation, with the
+human still holding the off switch (the countdown) and the approval (the
+prompt).
+
+## Acceptance criteria (EARS)
+- The system shall let a task be armed on one or more monitor references,
+  persisted as `runs-on-alert` rows (from = task, to = `<source>:<id>`) in the
+  git-synced `relations.md`.
+- The system shall read monitor sources from a machine-local, gitignored
+  `.monitor-sources.json`, supporting at least the `prometheus` and `grafana`
+  source types; `datadog` is optional.
+- The system shall obtain a source credential only by running that source's
+  configured command, and shall not persist the credential.
+- While the app is running, the system shall poll every armed reference on a
+  fixed interval (default 60 s) whether or not the window is focused, and shall
+  poll immediately when a row is added and on "Check now".
+- When a `prometheus` reference is polled, the system shall treat it as firing
+  when an `ALERTS` series with that `alertname`, `alertstate="firing"` and every
+  given label matcher exists.
+- When a `grafana` reference is polled, the system shall treat it as firing when
+  the Grafana-managed rule with that UID is in the firing state.
+- When an armed reference starts a new incident and its task is not DONE or
+  CLOSED, the system shall begin a K01 countdown for that task carrying the
+  monitor prompt.
+- The system shall react at most **once per incident**: a later poll, or an app
+  relaunch, during the same incident shall not fire again.
+- When a reference is first seen while already firing, the system shall record
+  that incident as handled and shall not fire.
+- When the countdown elapses and the task has no live terminal, the system shall
+  open its terminal (F12, F09) with the monitor prompt appended to the
+  work-on-task prompt in one submission.
+- When the countdown elapses and the task has a live terminal, the system shall
+  show a notification naming the monitor and the task and shall not start a
+  second agent.
+- When the user cancels the countdown, the system shall skip that incident and
+  shall keep the row armed.
+- When the task is a v2 task, the system shall append one `monitor` line to its
+  timeline per fired incident.
+- When a reference cannot be evaluated (unknown source, credential command
+  fails, HTTP or parse error), the system shall show an `error` state for it and
+  keep polling the others.
+- The system shall list every armed reference with its task, state and
+  last-checked time in a Monitors section, with add, remove and Check now.
+
+## Build notes
+- **One more poller, modelled on L01's.** Same shape as the PR poller: read the
+  rows, group by reference (one HTTP call per reference even when several tasks
+  arm on it), compare with the cached status, react, write the cache, push it to
+  the renderer. Different cadence (60 s) and **no focus gate**.
+- **Prometheus check is one instant query.** `GET <url>/api/v1/query?query=`
+  `ALERTS{alertname="X",alertstate="firing",<matchers>}`. Non-empty result =
+  firing. `activeAt` isn't in `ALERTS`; use `ALERTS_FOR_STATE` (its value is the
+  activation unix time) when present, else the first-seen poll time. Parse the
+  reference as `name` + optional `{…}` and splice the matchers in verbatim after
+  validating them against `^[a-zA-Z_][a-zA-Z0-9_]*(=|!=|=~|!~)"[^"]*"$`.
+- **Grafana check is the rules list.** `GET <url>/api/prometheus/grafana/api/v1/rules`
+  returns every Grafana-managed rule with `uid`, `state` and its `alerts[]`
+  (each with `activeAt`). One call per source per tick covers all its UIDs.
+- **Datadog check** (if built): `GET https://api.<site>/api/v1/monitor/<id>`
+  with `DD-API-KEY` / `DD-APPLICATION-KEY`; `overall_state === "Alert"`; incident
+  start = `overall_state_modified`.
+- **Reuse the autorun queue, don't build a second countdown.** Add an "external
+  fire" entry point to the K01 scheduler (a transient target carrying an
+  `extraPrompt`), so the countdown, one-at-a-time queue, post-fire gate and the
+  live-terminal rule are shared. The extra prompt rides the same path L01 uses
+  (`extraPrompt` appended in the F12 submission). An external target patches
+  nothing on cancel or fire — the row is the arm, and it stays.
+- **Credentials:** run `tokenCmd` with a timeout, cache the token in memory for a
+  few minutes, drop it on a 401/403 and re-run once.
+- **New relation type** = D04: add `runs-on-alert` to the relation-type union and
+  to the reader's known-types set, or a later write of `relations.md` drops the
+  rows.
+- **Not in scope:** subgoal-level arming (a `monitor` blocker kind in a v2
+  document), and acting on *resolve*. Both fit the same poller later.
