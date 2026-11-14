@@ -88,6 +88,16 @@ turns "don't reboot, you'll lose the terminals" into a button.
   terminal.
 - The system shall update the snapshot when a terminal is opened, when a tab is
   closed, and when tabs are reordered, without any user action.
+- The system shall remove a terminal from the snapshot only when the user closes
+  it. When a terminal's session disappears any other way (a crashed or killed
+  terminal backend, an external kill, a reboot), the system shall keep its entry —
+  with the session it would resume — and offer it for restore; a save made while
+  it is missing shall never drop it.
+- Where the snapshot holds missing terminals, the restore offer shall also let the
+  user discard them, and only then shall they leave the snapshot.
+- When the terminal backend itself restarts (e.g. the tmux server is replaced),
+  the system shall log it, together with every session that vanished, so a mass
+  loss can be dated afterwards.
 - While terminals are open, the system shall refresh the snapshot periodically so
   that a working-directory change or an externally created session is captured.
 - When the app quits, or the operating system reports an impending shutdown, the
@@ -113,7 +123,7 @@ turns "don't reboot, you'll lose the terminals" into a button.
 `.terminals.json` in the data root next to `.llm-status.json` / `.claude-sessions.json`
 (gitignored, machine-local — session names are meaningless on another machine).
 Shape: `{ savedAt, terminals: [{ name, taskId, cwd, order, claudeSessionId,
-claudeSessionCwd, lastSeenAt }] }`.
+claudeSessionCwd, lastSeenAt, lostAt? }] }`.
 Write through the existing atomic-write helper; a torn snapshot is worse than a
 stale one.
 
@@ -150,6 +160,17 @@ the F09 IN PROGRESS write. Restore sequentially, in recorded order, so names and
 tab positions land deterministically and fifteen `claude --resume` launches don't
 stampede. Sessions that are already alive are skipped by name — the existing
 "attach, don't recreate" behaviour of `openSession` already guarantees this.
+
+### A lost terminal is not a closed terminal
+The snapshot is rebuilt from the live sessions, so a naive save after a crash
+writes the survivors only — and the restore offer forgets exactly the terminals
+it exists for. (Seen for real: ~50 terminals vanished at once and the next
+auto-save, seconds later, shrank the snapshot to the 10 still alive.) Merge
+instead: live sessions are refreshed, entries whose session is gone are carried
+over unchanged (stamped `lostAt` when first seen missing), and only the explicit
+close path (tab ×) or the user discarding the restore offer removes an entry.
+Watch the backend's identity too: the tmux server pid changing means every
+earlier session died with it — log it.
 
 ### Stale status
 `.llm-status.json` is keyed by session name and survives reboots, so a restored
