@@ -167,6 +167,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **P06** Control CLI always reachable (`taskman` on PATH in app terminals + unconditional, zero-install invocation) — S — requires P01, P02 — [spec](features/P06-control-cli-always-reachable.md)
 - [ ] **P07** Local web reports (script-backed HTML pages on the app's loopback server, recomputed on every F5) — M — requires P01 — [spec](features/P07-local-web-reports.md)
 - [ ] **P08** Report → terminal links (click a task/subgoal in a web report to focus its terminal or start it) — S — requires P07, P02 — [spec](features/P08-report-open-terminal-links.md)
+- [ ] **P09** Report actions (buttons in a web report run the report's declared action script, then refresh) — S — requires P07, P08 — [spec](features/P09-report-actions.md)
 
 ## Epic Q — Time-bound tasks  · Start / Due, the Today view, repeating chores
 
