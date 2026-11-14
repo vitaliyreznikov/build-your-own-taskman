@@ -85,6 +85,10 @@ active scheduler while keeping the human in the loop via the countdown.
 - When a `cron` expression has no computable next occurrence (malformed), the
   system shall treat the task as un-armed and surface it as invalid rather than
   fire.
+- When a fire finds a terminal already open for the task, the system shall not
+  launch a second agent on top of it, and shall still apply the fire's record
+  change (disarm / advance). Without L03 it notifies; with L03 it delivers the
+  work-on-task prompt into that session and notifies only if delivery fails.
 
 ## Build notes
 - Reuse, don't fork: the fire action is the existing `termOpen({ taskId,

@@ -89,8 +89,8 @@ clocks.
 - The system shall serialize task and subgoal fires through one shared queue so
   that multiple items coming due at once launch one terminal at a time.
 - When a subgoal fire finds a live terminal already open for that subgoal, the
-  system shall surface a notification instead of launching a second agent on top
-  of it.
+  system shall not launch a second agent on top of it; it shall deliver the
+  work-on-subgoal prompt into that session (L03), falling back to a notification.
 - When a subgoal's `cron` expression has no computable next occurrence (malformed),
   the system shall treat that subgoal as un-armed rather than fire.
 

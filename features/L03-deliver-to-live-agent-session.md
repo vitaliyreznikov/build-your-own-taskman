@@ -3,13 +3,14 @@ id: L03
 epic: L — PR-review blocking
 title: Deliver a trigger into the task's live agent session (a helper agent sends it)
 size: M
-requires: [L01, J03, H08]
+requires: [L01, J03, H08, K01]
 novel: true
 ---
 
 ## What
 When an external trigger fires for a task that **already has a live terminal**
-— a PR became actionable (L01/O14), a monitor fired (L02) — the app no longer
+— a PR became actionable (L01/O14), a monitor fired (L02) — or a **scheduled
+autorun** comes due (K01 task, K02 subgoal, Q03 `each`) — the app no longer
 just shows a notification. It **delivers the trigger's prompt into the agent
 session running in that terminal**, as a message the agent reads and acts on at
 its next turn boundary.
@@ -36,22 +37,25 @@ and exits.
 
 The delivered message is the same prompt the trigger would have appended when
 opening a fresh terminal, prefixed with a one-line header naming the trigger
-(`[TaskMan] PR approved: …` / `[TaskMan] monitor fired: …`), so the agent can
-tell it apart from the human typing.
+(`[TaskMan] PR approved: …` / `[TaskMan] monitor fired: …` /
+`[TaskMan] scheduled autorun (cron): …`), so the agent can tell it apart from the
+human typing. For a scheduled autorun the prompt is the work-on-task (or
+work-on-subgoal, O09) prompt the fire would have typed into a fresh terminal.
 
 ## Why it exists
 "Already has a terminal" is the common case, not the exception: a task waiting
 on a PR or a monitor usually still has the session that opened the PR or armed
-the monitor. A notification there means the trigger dies unless the human is
-watching — the opposite of the point of L01/L02 when the event lands at night.
+the monitor, and a task armed to run every morning usually still has
+yesterday's tab open. A notification there means the trigger dies unless the
+human is watching — the opposite of the point of L01/L02 when the event lands at night.
 Typing into the pane would collide with whatever the human is typing and with a
 running turn; the agent's own peer-messaging queues the message and hands it
 over at a turn boundary, which is exactly the semantics of "another teammate
 tells you something".
 
 ## Acceptance criteria (EARS)
-- When an L01/O14 PR reaction or an L02 monitor fire is due for a task (or
-  subgoal) that has a live terminal, the system shall deliver the trigger's
+- When an L01/O14 PR reaction, an L02 monitor fire or a K01/K02/Q03 scheduled
+  autorun fire is due for a task (or subgoal) that has a live terminal, the system shall deliver the trigger's
   prompt into the agent session running in that terminal instead of only
   notifying.
 - The system shall deliver by running a headless helper agent that addresses the
@@ -67,6 +71,13 @@ tells you something".
 - When delivery succeeds, the system shall show a notification saying which
   task's session received it.
 - The delivered message shall start with a header line naming the trigger.
+- When a scheduled autorun fire is delivered into a live session (or falls back
+  to the notification), the system shall still apply that fire's record change
+  exactly as a launch would — `once` disarms, `cron` advances, `each` marks the
+  occurrence fired — and shall release the autorun queue's gate at once, since no
+  new session was started.
+- The system shall deliver a scheduled autorun fire with the same work-on-task /
+  work-on-subgoal prompt the fire would have typed into a newly opened terminal.
 
 ## Build notes
 - **Helper invocation.** `claude -p --model haiku --allowedTools ListAgents SendMessage`
@@ -84,6 +95,12 @@ tells you something".
   burst of triggers should not spawn a burst of agents.
 - **Live-terminal lookup** reuses the existing test (tmux session list + P05
   rebinds + O09 subgoal slug); it now returns the session name(s), not a bool.
+- **Scheduled fires** take the same path as external ones at the K01 commit
+  point: the "terminal already open" branch no longer only notifies. The header
+  names the mode (`scheduled autorun (once|cron|each): <title>`); the prompt is
+  built by the same function the terminal launch uses, so the two can't drift.
+  Delivery is fire-and-forget — the record patch and the gate release don't wait
+  for the helper (up to ~150 s).
 - This is the reference implementation's choice of transport. Any agent with a
   peer-messaging / inbox mechanism works the same way; without one, fall back to
   the notification.
