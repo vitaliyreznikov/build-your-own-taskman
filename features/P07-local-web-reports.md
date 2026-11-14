@@ -53,7 +53,20 @@ install.
   execute the report's script with the data root as cwd and return its stdout as
   `text/html; charset=utf-8` with `Cache-Control: no-store`.
 - When the same report is requested again (F5), the app shall run the script again;
-  it shall not serve a cached result.
+  a previous result may be shown only while the new run is in progress (below), never
+  instead of it.
+- When `GET /reports/<id>` is requested and a previous successful result exists, the
+  app shall respond immediately with that previous page plus a loading bar pinned to
+  the top, then fetch `GET /reports/<id>?fresh=1` (which runs the script) and replace
+  the page with the result once it arrives. With no previous result it shall show only
+  the loading bar until the run finishes.
+- The app shall keep the last successful output per report on disk (machine-local,
+  gitignored `.reports-cache/<id>.html`) so the previous state survives an app restart.
+- Every report page shall carry a **Reload** control in that top bar; clicking it shall
+  show the loading bar and re-run the report in place without leaving the page
+  (keeping the current content visible until the new one arrives).
+- If a background refresh fails, then the page shall keep the previous content and
+  show the failure (exit status) in the top bar.
 - While a run of a report is in flight, a concurrent request for the same report
   shall wait for and share that run's result rather than start a second one.
 - If the script exits non-zero, times out (60 s) or the entry is invalid, then the app
@@ -72,6 +85,11 @@ install.
   appears without an app restart.
 
 ## Build notes
+- The top bar (loading line, "updated HH:MM", Reload) is injected by the app into
+  whatever the script printed, so every report gets it for free; the script stays a
+  plain "print an HTML page" program. Swap the content with
+  `document.open(); document.write(html); document.close()` so the report's own
+  inline scripts (e.g. a copy-to-clipboard button) run again.
 - Implement as a handler module the P01 server calls **before** its token guard and
   that returns "not mine" for any other path — the API routes don't change.
 - Spawn with `execFile`/`spawn` (no shell), `cwd = DATA_ROOT`, a timeout and a
