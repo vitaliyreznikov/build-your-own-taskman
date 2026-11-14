@@ -78,7 +78,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **F04** Multiple terminals per task — M — requires F01
 - [ ] **F05** Per-terminal ID export (`TASKS_TERM_ID`) — S — requires F04
 - [ ] **F06** Terminal tabs — M — requires F04
-- [ ] **F07** Drag-and-drop reorder tabs — S — requires F06
+- [ ] **F07** Drag-and-drop reorder tabs (+ menu: move to first / last) — S — requires F06 — [spec](features/F07-drag-and-drop-reorder-tabs.md)
 - [ ] **F08** High-contrast active tab — S — requires F06
 - [ ] **F09** Auto-move task to IN PROGRESS on terminal open — S — requires F01, A04
 - [ ] **F10** Single-instance lock + guard closing a tab while an agent runs — M — requires F04
