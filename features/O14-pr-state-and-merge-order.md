@@ -72,10 +72,15 @@ Everything downstream reads the derived status rather than the raw state:
 
 - The blocker chip says what is true and what is missing:
   `PR #8285 · approved · gated (2)`, its detail naming each unmet entry.
-- **The auto-resume reaction (L01) fires on `approved` and not gated** — the edge
-  where the PR became actionable — instead of on "a human reviewed it". A review
-  that lands on a gated PR is remembered, not announced, and announces itself when
-  the last gate clears.
+- **The auto-resume reaction (L01) fires on every new human review** — Approve,
+  Request-changes or a plain Comment review — once per review, and the prompt says
+  which kind it was and who left it. The one exception is the merge-order gate:
+  **an approval on a gated PR** is remembered, not announced ("go merge it" would be
+  wrong), and announces itself when the last gate clears. A comment or a
+  change request fires even while gated — answering feedback doesn't depend on
+  merge order. *(Until 2026-11-14 a comment review fired nothing: only `approved`
+  and `changes-requested` were treated as actionable. That dropped real review
+  feedback on the floor, so every review now counts.)*
 - A `merged` or `closed` blocker resolves itself, exactly as an O12 dependency
   does when its target is `done`. The record stays in the document as history.
 - A transition appends one line to the task's timeline (O05), so the document
@@ -137,10 +142,14 @@ the split this feature exists to close.
   state how many entries are unmet.
 - While a blocker is presented as gated, the system shall name each unmet `after`
   entry and shall present the blocker's `note` alongside them.
-- When a `pr` blocker becomes `approved` with no unmet `after` entry, the system
-  shall fire the review reaction for the blocked unit of work exactly once.
-- While a `pr` blocker is gated, the system shall not fire the review reaction, and
-  shall fire it when the last unmet entry becomes met without requiring a new review.
+- When a new human review (Approve, Request-changes or Comment, by a non-author,
+  non-bot) is submitted on a `pr` blocker's pull request, the system shall fire the
+  review reaction for the blocked unit of work exactly once for that review, and the
+  reaction's prompt shall name the review kind and its author.
+- While a `pr` blocker is gated, the system shall not fire the reaction for an
+  approval, and shall fire it when the last unmet entry becomes met without
+  requiring a new review; a comment or change-request review shall fire even while
+  the blocker is gated.
 - The system shall treat a `pr` blocker whose state is `merged` or `closed` as
   resolved, and shall keep the blocker record in the document.
 - When a `pr` blocker's state changes, the system shall append one entry to the

@@ -16,7 +16,7 @@ dedicated **"PRs" view** of every PR currently waiting for review, and runs a
 active**) that asks GitHub — via the `gh` CLI — whether each tracked PR has been
 reviewed by a human.
 
-When a tracked PR gets its **first human review** (any submitted review —
+When a tracked PR gets a **new human review** (any submitted review —
 Approve, Request-changes, or a plain commented review — from someone other than
 the PR author, excluding bots), the app reacts per blocking task:
 
