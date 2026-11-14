@@ -23,6 +23,8 @@ the PR author, excluding bots), the app reacts per blocking task:
 - **The task already has a live terminal** → just fire a desktop notification
   ("PR reviewed — check it") so the human notices; don't disturb the running
   session.
+  *(L03 upgrades this branch: the prompt is delivered into the live session,
+  and the notification remains only as the fallback.)*
 - **The task has no live terminal** → open the task's terminal exactly as F12
   does (types `claude` + the work-on-task prompt, moves to IN PROGRESS), and
   appends an **extra prompt**:
