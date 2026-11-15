@@ -86,7 +86,8 @@ single Column value cannot hold.
 - When a repeating task is skipped, the system shall do the same with `skipped`.
 - The system shall not advance a repeating task's row, nor log an occurrence
   `missed`, on its own: when the next occurrence's start arrives while the
-  current occurrence is still open, the row shall stay on the current one.
+  current occurrence is still open, the row shall stay on the current one. (Exception: an
+  `each` task whose occurrence has passed is auto-skipped — see Q07.)
 - When any task that has a Due is moved to DONE, the system shall append a `done`
   line for it.
 - When an occurrence of a repeating task is snoozed, the system shall append a
