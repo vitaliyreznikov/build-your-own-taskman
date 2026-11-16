@@ -138,7 +138,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 
 - [ ] **L01** ⭐ Block a task on PR review, watch for reviews, auto-resume the agent — L — requires F12, E01, H07 — [spec](features/L01-pr-review-blocking.md)
 - [ ] **L02** Run a task when a monitor (by ID) fires — `runs-on-alert` relation, Prometheus/vmalert `ALERTS` or Grafana rule UID, each check covers the gap since the last successful one, own Monitors view, K01 countdown — M — requires L01, K01, D04, L03 — [spec](features/L02-run-task-when-monitor-fires.md)
-- [ ] **L03** ⭐ Deliver a trigger into the task's live agent session — PR reaction, monitor fire or scheduled autorun (headless helper agent sends it by peer-messaging, on the terminal's account; notification only as fallback) — M — requires L01, J03, H08, K01 — [spec](features/L03-deliver-to-live-agent-session.md)
+- [ ] **L03** ⭐ Deliver a trigger into the task's live agent session — PR reaction, monitor fire or scheduled autorun (headless helper agent sends it by peer-messaging, on the terminal's account; notification only as fallback) — M — requires L01, J03, H08, K01, F23 — [spec](features/L03-deliver-to-live-agent-session.md)
 - [ ] **L04** Local `command` checks as a monitor source — shell check per reference (exit 0 = firing, 1 = ok), own `intervalSec`, ok→firing = one incident (e.g. run a disk-cleanup task when free space < 20 GB) — S — requires L02 — [spec](features/L04-local-command-monitor-source.md)
 
 ## Epic O — Structured task documents (v2)

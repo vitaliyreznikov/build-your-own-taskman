@@ -3,7 +3,7 @@ id: L03
 epic: L — PR-review blocking
 title: Deliver a trigger into the task's live agent session (a helper agent sends it)
 size: M
-requires: [L01, J03, H08, K01]
+requires: [L01, J03, H08, K01, F23]
 novel: true
 ---
 
@@ -96,6 +96,15 @@ tells you something".
   delivered and name the session and the failure reason.
 - The system shall not wake or poke an idle target session before sending: a
   peer message to an idle agent starts its next turn by itself.
+- If the chosen terminal is hibernated (F23: tab kept, a plain shell, its
+  conversation recorded), then the system shall wake it — resume that same
+  conversation, exactly as viewing the tab would — wait until its agent is up,
+  and then deliver; the trigger shall not be lost or turned into a notification
+  only because its terminal was asleep.
+- If the chosen terminal is neither hibernated nor running an agent (the agent
+  exited and only the shell is left), then the system shall not start a helper
+  and shall fall back to the notification with the reason "no agent running in
+  <session>".
 - When a scheduled autorun fire is delivered into a live session (or falls back
   to the notification), the system shall still apply that fire's record change
   exactly as a launch would — `once` disarms, `cron` advances, `each` marks the
@@ -143,6 +152,15 @@ tells you something".
 - **Idle targets need no wake-up.** A peer message to an idle session is queued
   and starts its next turn by itself (observed: sessions idle 20 min – 8 h began
   a turn 2–5 s after the message arrived), so the helper only sends.
+- **Asleep is not live.** A terminal restored or put to sleep by F23 still has
+  its tmux session, so the session list alone calls it live, yet nothing in it
+  can receive a peer message: the helper finds no peer, and a scheduled fire
+  that took this path was silently lost (observed: two morning cron autoruns
+  restored asleep after a restart). Check the hibernation record first: wake
+  (type the resume), poll until the agent process is in the pane (~45 s cap),
+  give it a few seconds to register as a peer, then send; if the helper still
+  finds no peer, wait and retry once. Waking happens only for a trigger that is
+  actually delivered — never to "check" a session.
 - **Choosing among a task's sessions.** The lookup returns each live session with
   its kind (task's own / subgoal); a pure chooser picks task-own first for a
   task-level trigger. Ordering by "most recently active" across both kinds is
