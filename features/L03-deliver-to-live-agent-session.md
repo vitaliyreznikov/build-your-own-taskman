@@ -22,16 +22,23 @@ peer session by its terminal (tmux) name and send it the prompt verbatim with
 its session-messaging tool. The helper prints `SENT <peer>` or `FAIL <reason>`
 and exits.
 
-- **Which terminal:** for a task-level trigger, the task's live terminals; for a
-  subgoal trigger (O07), that subgoal's own terminal (O09). With several, the one
-  whose agent status (H08) changed most recently.
+- **Which terminal:** for a subgoal trigger (O07), that subgoal's own terminal
+  (O09). For a task-level trigger (a task-level PR blocker, a monitor armed on
+  the task, a task autorun), the **task's own terminal** (`task-<id>`, or a
+  session re-bound to the task, P05) — never a subgoal terminal while the task's
+  own terminal is live, however busy the subgoal worker is. Only when no task
+  terminal is live does it fall back to the task's most recently active subgoal
+  terminal, and the delivered message then says that it was routed there because
+  the task terminal isn't open. With several candidates of the same kind, the
+  one whose agent status (H08) changed most recently.
 - **Which account:** the account the running agent actually uses (J03's
   `configDir` from the status file), else the terminal's remembered account,
   else the default. Peer discovery is per account — a helper on the wrong account
   sees no peers.
 - **Fallback:** if there is no agent running in the terminal (just a shell), the
   helper reports `FAIL`, times out, or exits non-zero, the app shows the
-  notification it used to show. A successful delivery also shows a quiet
+  notification it used to show — titled so it's clear the trigger was **not**
+  delivered, with the session and the reason. A successful delivery also shows a quiet
   notification ("delivered to I665's session") so the human knows the agent was
   woken.
 
@@ -71,6 +78,24 @@ tells you something".
 - When delivery succeeds, the system shall show a notification saying which
   task's session received it.
 - The delivered message shall start with a header line naming the trigger.
+- When a task-level trigger is delivered and the task's own terminal (`task-<id>`
+  or a session re-bound to the task) is live, the system shall deliver into that
+  terminal, even if a subgoal terminal of the same task was active more recently.
+- If a task-level trigger is delivered and no task terminal is live but a subgoal
+  terminal of the task is, then the system shall deliver into the most recently
+  active subgoal terminal and the message shall say it was routed there because
+  the task terminal is not open.
+- The system shall log, for every delivery, the chosen session and why it was
+  chosen (subgoal's own / task's own / fallback to a subgoal terminal).
+- The system shall start the helper by an absolute path to the agent CLI,
+  resolved independently of how the app itself was launched (the app's PATH, the
+  agent's standard install locations, then the user's interactive shell); if the
+  helper cannot be started because the CLI is not found, the system shall
+  re-resolve the path and retry once.
+- When delivery fails, the fallback notification shall say the trigger was not
+  delivered and name the session and the failure reason.
+- The system shall not wake or poke an idle target session before sending: a
+  peer message to an idle agent starts its next turn by itself.
 - When a scheduled autorun fire is delivered into a live session (or falls back
   to the notification), the system shall still apply that fire's record change
   exactly as a launch would — `once` disarms, `cron` advances, `each` marks the
@@ -104,6 +129,25 @@ tells you something".
 - This is the reference implementation's choice of transport. Any agent with a
   peer-messaging / inbox mechanism works the same way; without one, fall back to
   the notification.
+- **Resolving the CLI.** Don't rely on `zsh -lc 'claude …'`: a login,
+  non-interactive shell reads `.zprofile` but not `.zshrc`, and the native
+  installer's `~/.local/bin` is commonly added only in `.zshrc`. The app then
+  finds `claude` only when it happened to be started from an interactive
+  terminal; started any other way, every delivery fails with
+  `command not found: claude` (exit 127) until the next restart. Resolve once:
+  the app's own `PATH`, then `~/.local/bin/claude`, `~/.claude/local/claude`,
+  `/opt/homebrew/bin/claude`, `/usr/local/bin/claude`, then
+  `$SHELL -ilc 'command -v claude'`; spawn the absolute path directly (no shell).
+  Cache it, and drop the cache and retry once on `ENOENT`. The `~/.local/bin`
+  symlink being swapped by an auto-update is harmless — the path stays valid.
+- **Idle targets need no wake-up.** A peer message to an idle session is queued
+  and starts its next turn by itself (observed: sessions idle 20 min – 8 h began
+  a turn 2–5 s after the message arrived), so the helper only sends.
+- **Choosing among a task's sessions.** The lookup returns each live session with
+  its kind (task's own / subgoal); a pure chooser picks task-own first for a
+  task-level trigger. Ordering by "most recently active" across both kinds is
+  the bug this rules out: a busy subgoal worker would steal every task-level
+  trigger from the orchestrating task terminal.
 - **Log each delivery** (`[deliver]`): target session, account, and outcome
   (`SENT <peer>` / no live session / failure reason), so a delivery can be
   audited after the fact — the success notification is gone by morning.
