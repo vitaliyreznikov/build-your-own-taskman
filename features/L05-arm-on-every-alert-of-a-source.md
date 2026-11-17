@@ -65,8 +65,14 @@ TaskMan stays a delivery mechanism; the comparison is ordinary agent work.
   incident.
 - When a `datadog` wildcard is checked, the system shall read the Datadog events
   API for monitor alert events in the window, and shall treat each
-  (monitor id, group, event time) of a transition into the alert state as one
-  incident.
+  (monitor id, group, event time) of a transition into the alert state, and
+  of a transition into the warn state (a separate `warn`-level instance, the
+  twin of a split warn-tier rule on the other stack), as one incident; a
+  recovery shall close both tiers, and a move between alert and warn shall
+  close the tier it leaves.
+- Each check after the first shall also re-read the 10 minutes before its
+  window, so that an event the source indexed late is still found; the
+  handled set shall keep it from being delivered twice.
 - The system shall react at most once per incident: it shall keep a record of
   the incidents already handled for each wildcard reference, so that a later
   check, an overlapping window or an app relaunch does not deliver the same
