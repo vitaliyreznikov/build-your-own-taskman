@@ -87,6 +87,16 @@ TaskMan stays a delivery mechanism; the comparison is ordinary agent work.
   (any source type, not only `command`), with each check still covering the
   window since the previous successful one; "Check now" and a reference in
   `error` state shall not wait for the interval.
+- Where a source sets `notifyEverySec` (≥ 60), the system shall still append
+  every new incident to the inbox file at once, but shall send the task at most
+  one notice per that interval for that reference; a notice shall cover every
+  line appended since the previous notice (one or more file + line ranges), and
+  incidents held back shall be sent once the interval has passed even if no new
+  incident arrives.
+- Where a source sets `quiet: true`, the system shall deliver its fires without
+  the K01 countdown, the in-app countdown banner, a desktop notification or a
+  sound; when such a delivery fails, the system shall show a notification
+  without sound naming the task and the reason.
 - The Monitors view shall show a wildcard row with the number of alerts firing
   on it now and the time of the last delivered incident.
 
@@ -115,5 +125,10 @@ TaskMan stays a delivery mechanism; the comparison is ordinary agent work.
 - **Firehose cadence.** A wildcard is heavier than one rule, so give its source
   its own entry with `intervalSec` (e.g. 120) instead of slowing the shared
   60 s poll; a second source entry may point at the same URL.
+- **Throttle and quiet are per source.** A firehose wakes an agent every check;
+  `notifyEverySec` (e.g. 600) batches notices while the inbox stays complete,
+  and `quiet` keeps a routine stream from popping up on the desktop. Keep the
+  held-back line ranges and the last notice time per (reference, task) in
+  `.monitor-status.json` so a restart neither loses nor repeats them.
 - **Status entry.** For a wildcard, `state` is `firing` while any alert matches
   and `labels` carry `count=<n>` instead of one series' labels.
