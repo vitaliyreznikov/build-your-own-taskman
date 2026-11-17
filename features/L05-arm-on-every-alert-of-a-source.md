@@ -77,6 +77,11 @@ TaskMan stays a delivery mechanism; the comparison is ordinary agent work.
   shall list the first incidents up to the limit, state how many were left out,
   and write the full list to a file in the task's detail directory named in the
   prompt.
+- Where a source sets `intervalSec` (≥ 60) in `.monitor-sources.json`, the
+  system shall check that source's references at most once per that interval
+  (any source type, not only `command`), with each check still covering the
+  window since the previous successful one; "Check now" and a reference in
+  `error` state shall not wait for the interval.
 - The Monitors view shall show a wildcard row with the number of alerts firing
   on it now and the time of the last delivered incident.
 
@@ -100,5 +105,8 @@ TaskMan stays a delivery mechanism; the comparison is ordinary agent work.
 - **Large lists.** The overflow file is `<task dir>/alerts-<source>-<stamp>.jsonl`,
   one incident per line. It is a delivery artifact, not task history; the agent
   may delete it after handling.
+- **Firehose cadence.** A wildcard is heavier than one rule, so give its source
+  its own entry with `intervalSec` (e.g. 120) instead of slowing the shared
+  60 s poll; a second source entry may point at the same URL.
 - **Status entry.** For a wildcard, `state` is `firing` while any alert matches
   and `labels` carry `count=<n>` instead of one series' labels.
