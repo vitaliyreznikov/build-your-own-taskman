@@ -35,11 +35,15 @@ them across many rules.
 | `datadog` | `*` (optionally `*{tag:value}` as a monitor-event query) | one monitor alert event (monitor id + group) transitioning to `Triggered` / `Alert`, from the events API |
 | `grafana`, `command` | — | not supported; the reference shows an error |
 
-A check that finds new incidents produces **one** delivery for the task, listing
-all of them, newest last, each with its alert name, labels or group, start time
-and whether it is still firing. Fires on different sources (`vm:*` and `dd:*`)
-reach the task as separate deliveries, so the agent can tell which system raised
-what.
+A check that finds new incidents **appends them to the task's inbox file**
+`<task dir>/alerts.jsonl` — one JSON object per incident, oldest first, each
+naming the reference and source it came from — and then sends the task **one
+short notice**: how many incidents, how many still firing, and the file and line
+range just appended. The incidents live in the file, not in the prompt, so a
+burst of hundreds costs one small message, nothing is truncated, and the file is
+a durable history the agent can diff against. Fires on different sources
+(`vm:*` and `dd:*`) land in the same inbox, each line saying which system raised
+it, and reach the terminal as separate notices.
 
 ## Why it exists
 Running two alerting systems side by side (a migration, a dual-run) raises one
@@ -70,13 +74,13 @@ TaskMan stays a delivery mechanism; the comparison is ordinary agent work.
 - When a wildcard reference is checked for the first time, the system shall
   record the alerts already firing as handled and shall not fire.
 - When a check finds one or more new incidents and the task is not DONE or
-  CLOSED, the system shall make **one** L02 fire for that task whose prompt
-  lists every new incident with its alert name, labels or group, start time and
-  whether it is still firing.
-- When the incident list exceeds the prompt limit (default 50), the system
-  shall list the first incidents up to the limit, state how many were left out,
-  and write the full list to a file in the task's detail directory named in the
-  prompt.
+  CLOSED, the system shall append every new incident to `<task dir>/alerts.jsonl`
+  (one JSON object per line, oldest first, with reference, source, alert name,
+  labels or group, start time and whether it is still firing), and then make
+  **one** L02 fire for that task whose prompt names the file and the line range
+  appended.
+- If appending to the inbox file fails, the system shall list up to 50 of the
+  new incidents in the prompt instead and say how many were left out.
 - Where a source sets `intervalSec` (≥ 60) in `.monitor-sources.json`, the
   system shall check that source's references at most once per that interval
   (any source type, not only `command`), with each check still covering the
@@ -102,9 +106,10 @@ TaskMan stays a delivery mechanism; the comparison is ordinary agent work.
   not enough when many alerts start in the same second. Keep a set of handled
   incident keys per reference in `.monitor-status.json`, and prune keys older
   than the 30-day window cap.
-- **Large lists.** The overflow file is `<task dir>/alerts-<source>-<stamp>.jsonl`,
-  one incident per line. It is a delivery artifact, not task history; the agent
-  may delete it after handling.
+- **Inbox file.** Append-only (`appendFile`), never rewritten by the app; count
+  the existing lines first to report the range. The agent owns it after that —
+  it may rotate or trim it once handled. Several wildcard references armed on
+  one task share the one file.
 - **Firehose cadence.** A wildcard is heavier than one rule, so give its source
   its own entry with `intervalSec` (e.g. 120) instead of slowing the shared
   60 s poll; a second source entry may point at the same URL.
