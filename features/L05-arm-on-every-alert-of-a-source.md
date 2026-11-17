@@ -35,8 +35,8 @@ them across many rules.
 | `datadog` | `*` (optionally `*{tag:value}` as a monitor-event query) | one monitor alert event (monitor id + group) transitioning to `Triggered` / `Alert`, from the events API |
 | `grafana`, `command` | — | not supported; the reference shows an error |
 
-A check that finds new incidents **appends them to the task's inbox file**
-`<task dir>/alerts.jsonl` — one JSON object per incident, oldest first, each
+A check that finds new incidents **appends them to the task's inbox file for the day**
+`<task dir>/alerts-YYYY-MM-DD.jsonl` (local date of the check) — one JSON object per incident, oldest first, each
 naming the reference and source it came from — and then sends the task **one
 short notice**: how many incidents, how many still firing, and the file and line
 range just appended. The incidents live in the file, not in the prompt, so a
@@ -74,7 +74,8 @@ TaskMan stays a delivery mechanism; the comparison is ordinary agent work.
 - When a wildcard reference is checked for the first time, the system shall
   record the alerts already firing as handled and shall not fire.
 - When a check finds one or more new incidents and the task is not DONE or
-  CLOSED, the system shall append every new incident to `<task dir>/alerts.jsonl`
+  CLOSED, the system shall append every new incident to the day's inbox file
+  `<task dir>/alerts-YYYY-MM-DD.jsonl` (local date of the check)
   (one JSON object per line, oldest first, with reference, source, alert name,
   labels or group, start time and whether it is still firing), and then make
   **one** L02 fire for that task whose prompt names the file and the line range
@@ -108,8 +109,9 @@ TaskMan stays a delivery mechanism; the comparison is ordinary agent work.
   than the 30-day window cap.
 - **Inbox file.** Append-only (`appendFile`), never rewritten by the app; count
   the existing lines first to report the range. The agent owns it after that —
-  it may rotate or trim it once handled. Several wildcard references armed on
-  one task share the one file.
+  it may rotate or trim it once handled. One file per local day keeps each file small
+  and makes "what fired yesterday" one file; several wildcard references armed
+  on one task share the day's file.
 - **Firehose cadence.** A wildcard is heavier than one rule, so give its source
   its own entry with `intervalSec` (e.g. 120) instead of slowing the shared
   60 s poll; a second source entry may point at the same URL.
