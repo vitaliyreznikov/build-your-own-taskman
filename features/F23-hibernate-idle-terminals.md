@@ -86,6 +86,14 @@ user's place; hibernating frees the memory and keeps both.
 - The system shall keep hibernation records and settings machine-local (never
   synced): `enabled`, `idleHours` and `attentionHours`, defaulting to on, 3
   and 24.
+- When the settings file changes — new values, or only its modification time
+  (`touch`) — the system shall run a sweep with the new settings within a few
+  seconds instead of waiting for the next periodic sweep, so a changed threshold
+  applies at once and an agent or script can request a sweep without the
+  control API's approval gate. A change that lands while a sweep runs shall
+  cause one more sweep after it; a burst of changes shall cause one sweep.
+  *(Amended 2026-11-18: the only ways to sweep now were the tab-bar button and
+  waiting up to 10 minutes, and a monitor-triggered agent could do neither.)*
 
 ## Build notes
 - **Idle signal:** tmux's `#{session_activity}` (epoch seconds of the last pane
