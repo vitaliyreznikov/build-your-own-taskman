@@ -47,6 +47,13 @@ research, and route the work.
    `intake/<category>.md` (or `intake/common.md` for a change meant for every
    category) and records the edit in its session file. It doesn't edit the prompt
    on its own initiative.
+8. **A finished intake gets out of the way.** When the intake agent ends a turn
+   with `✅ done` (hand-off made, session file written), its tab is marked
+   finished at once (dimmed, ✓), and **2 minutes later the tab closes itself**
+   (the tmux session is killed). Any sign of life in between cancels the close:
+   the agent goes back to `working`/`attention`/`waiting`, or the user types in
+   that terminal. A `waiting` or `attention` intake is never closed
+   automatically.
 
 ## Why it exists
 F13 made "+" file a task before anyone knew what the work was. In practice "+"
@@ -91,6 +98,16 @@ place keeps every task's work on its own terminal, card and timeline.
   additional terminal for that task (or subgoal, with `--goal`) even if one is
   already open; without `--new` the existing focus-or-open behavior shall be
   unchanged.
+- When an intake terminal's agent status becomes `done`, the system shall mark
+  that tab as finished (visually distinct from live tabs) immediately.
+- While an intake terminal stays `done` with no keyboard input from the user,
+  the system shall close the tab and end its terminal session 2 minutes after
+  the status became `done`.
+- If the intake's status changes away from `done`, or the user types into that
+  terminal, before the 2 minutes elapse, the system shall cancel the pending
+  close and remove the finished mark.
+- The system shall never auto-close an intake whose status is `waiting` or
+  `attention`, nor any non-intake terminal.
 - The board-view new-task bar (B17) shall keep creating tasks directly, with no
   behavior change.
 
@@ -115,5 +132,11 @@ place keeps every task's work on its own terminal, card and timeline.
   categories file. Keep the files short: they are prompts.
 - The session-file stamp is minute-resolution. If two intakes start in the same
   minute, add a `-2` suffix rather than overwriting.
+- Auto-close lives in the renderer: watch the per-terminal status (H08) for
+  `intake-*` tabs, start a 2-minute timer on `done`, and close the tab through
+  the normal close path (the F10 "agent is running" guard doesn't apply; the
+  agent is idle at its prompt). Reset the timer on any status change or on
+  terminal input. Timers don't survive an app restart: on startup, an intake
+  that is already `done` gets a fresh 2 minutes.
 - The F13 create-task prompt can stay in code for a direct "new task + agent"
   path, but "+" no longer uses it.
