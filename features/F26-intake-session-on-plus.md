@@ -135,8 +135,9 @@ place keeps every task's work on its own terminal, card and timeline.
 - Auto-close lives in the renderer: watch the per-terminal status (H08) for
   `intake-*` tabs, start a 2-minute timer on `done`, and close the tab through
   the normal close path (the F10 "agent is running" guard doesn't apply; the
-  agent is idle at its prompt). Reset the timer on any status change or on
-  terminal input. Timers don't survive an app restart: on startup, an intake
+  agent is idle at its prompt). Any status change or terminal
+  input cancels the timer and drops the mark; a later fresh `done` starts a new
+  2 minutes. Timers don't survive an app restart: on startup, an intake
   that is already `done` gets a fresh 2 minutes.
 - The F13 create-task prompt can stay in code for a direct "new task + agent"
   path, but "+" no longer uses it.
