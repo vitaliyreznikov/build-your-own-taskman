@@ -96,6 +96,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **F23** ⭐ Hibernate idle agent terminals (💤 tab stays; view wakes the same conversation; reboot restore comes back asleep) — M — requires F14, H08, I01, J03 — [spec](features/F23-hibernate-idle-terminals.md)
 - [ ] **F24** "Started by" terminal filter (PR-review auto-launched terminals vs the rest; 🔁 tab mark) — S — requires F20, F22, L01 — [spec](features/F24-started-by-terminal-filter.md)
 - [ ] **F25** Orchestrator tab mark (right-click toggle; purple tab + 📡 on the tab and in the window title; view only) — S — requires F22, J03 — [spec](features/F25-orchestrator-tab-mark.md)
+- [ ] **F26** ⭐ "+" opens a short-lived intake session (per-category prompt files, memory of the last 10 intakes, hands off via `taskman run [--new]`, tab on the left; supersedes F13 on "+") — M — requires F13, B18, P02, P03, F06 — [spec](features/F26-intake-session-on-plus.md)
 
 ## Epic G — Prompt-parts library
 
