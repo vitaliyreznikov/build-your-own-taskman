@@ -182,3 +182,4 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **Q05** Subgoal Due (v2 subgoals with a deadline in Today; ✓ / snooze, badge, overdue notification) — M — requires Q02, Q04, O03, O15 — [spec](features/Q05-subgoal-due.md)
 - [ ] **Q06** Today ★ marker (a row whose task/subgoal has a starred open terminal shows ★ = in progress) — S — requires Q02, Q05, F22, O09 — [spec](features/Q06-today-starred-marker.md)
 - [ ] **Q07** `each` autorun catch-up (a stale occurrence of an `each` task is auto-skipped when the next one starts, so the agent keeps launching) — S — requires Q03, K01 — [spec](features/Q07-each-autorun-catch-up.md)
+- [ ] **Q08** Today priority filter (P0 / ≤P1 / ≤P2 / All, remembered in `today.json`; badge + Due notifications follow it; change priority from the row) — M — requires Q02, Q04, Q05, B05, C05 — [spec](features/Q08-today-priority-filter.md)
