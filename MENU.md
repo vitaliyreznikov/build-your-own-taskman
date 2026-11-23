@@ -177,6 +177,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **P10** `create-task --run` + worker brief (file a task and start its worker in one approved call; `run --prompt` briefs an existing worker) — M — requires P02, P03, P04, L03, J02, O02 — [spec](features/P10-create-and-run-with-brief.md)
 - [ ] **P11** Report cache max-age (per-report `maxAgeSec`: opening a report whose last result is fresh serves the cache without running the script; Reload forces a run) — S — requires P07, P09 — [spec](features/P11-report-cache-max-age.md)
 - [ ] **P12** Script run notifications (`taskman show status-bar|popup`: a closable status bar at the bottom while a script runs, a centered popup with its result that stays until closed; not approval-gated) — M — requires P01, P06, E01 — [spec](features/P12-script-run-notifications.md)
+- [ ] **P13** Auto-approve rules (a machine-local `.taskman-autoapprove.json` allowlist: a request matching a rule — e.g. open-terminal I9 — runs without Approve/Deny, still audited) — S — requires P01, P02 — [spec](features/P13-auto-approve-rules.md)
 
 ## Epic Q — Time-bound tasks  · Start / Due, the Today view, repeating chores
 
