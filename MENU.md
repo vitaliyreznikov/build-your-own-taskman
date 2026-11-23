@@ -176,6 +176,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **P09** Report actions (buttons in a web report run the report's declared action script, then refresh) — S — requires P07, P08 — [spec](features/P09-report-actions.md)
 - [ ] **P10** `create-task --run` + worker brief (file a task and start its worker in one approved call; `run --prompt` briefs an existing worker) — M — requires P02, P03, P04, L03, J02, O02 — [spec](features/P10-create-and-run-with-brief.md)
 - [ ] **P11** Report cache max-age (per-report `maxAgeSec`: opening a report whose last result is fresh serves the cache without running the script; Reload forces a run) — S — requires P07, P09 — [spec](features/P11-report-cache-max-age.md)
+- [ ] **P12** Script run notifications (`taskman notify start|finish`: a closable status bar at the bottom while a script runs, a centered popup with its result that stays until closed; not approval-gated) — M — requires P01, P06, E01 — [spec](features/P12-script-run-notifications.md)
 
 ## Epic Q — Time-bound tasks  · Start / Due, the Today view, repeating chores
 
