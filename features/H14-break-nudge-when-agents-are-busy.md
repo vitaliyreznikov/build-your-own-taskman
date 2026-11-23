@@ -27,8 +27,10 @@ The contract between the two programs is two gitignored files at the data root:
   normal break (its own length, its own overlay, its own logging) and deletes the
   file.
 
-The **busy-strip rule** looks at the terminal tabs in the shared tab order (F27),
-left to right, skipping every tab that tells nothing about whether the user is
+The **busy-strip rule** looks at the terminal tabs **currently shown in the strip**
+(after the category / ★ filter, F20/F22), in the shared tab order (F27), left to
+right — the user judges by what they see, so a hidden tab never blocks or allows a
+break. It skips every tab that tells nothing about whether the user is
 needed:
 
 - tabs marked as orchestrator (F25) — a coordinator is usually idle by design;
@@ -81,9 +83,15 @@ whether anyone is waiting. Neither can decide alone.
   focus timer.
 - When computing the busy-strip rule, the system shall skip orchestrator-marked,
   status-less and hibernated tabs and `done` tabs older than 10 minutes, take the
-  5 leftmost remaining tabs in the shared tab order regardless of the current
-  category/starred filter, and hold only when there are at least 2 and all are
-  `working` or `waiting`.
+  5 leftmost remaining tabs among those currently shown in the strip (after the
+  category/starred filter), in the shared tab order, and hold only when there are
+  at least 2 and all are `working` or `waiting`.
+- While the elapsed focus time is at least 30 minutes and the system has not
+  nudged in this cycle (the busy rule never held), the system shall show next to
+  the chip a short explanation of why no break was suggested — which shown tabs
+  need the user (e.g. "no quiet moment: I2 ⚠️, I813 ⚠️") — together with
+  **Break** and **Later** buttons, so the user can take the break anyway.
+  This adds no notification (the focus timer's own reminder fires around then).
 - The focus timer, on finding a `.focus-command.json` with `cmd: "break"` while
   focusing, shall start its own normal break and delete the file; on any other
   phase it shall delete the file without acting.
