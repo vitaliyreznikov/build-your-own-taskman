@@ -53,16 +53,18 @@ whether anyone is waiting. Neither can decide alone.
 > all busy — nobody waits for me — it proposes a short break."*
 
 ## Acceptance criteria (EARS)
-- While `.focus-state.json` exists, has `updatedAt` within the last 3 minutes and
-  `phase` is `focusing`, the system shall show a focus chip at the left end of the
-  main terminal tab strip with the elapsed focus time (`focusElapsedSec` plus the
-  time since `updatedAt`) as minutes.
+- While `.focus-state.json` exists, has `updatedAt` within the last 3 minutes,
+  `phase` is `focusing` and the elapsed focus time (`focusElapsedSec` plus the time
+  since `updatedAt`) is at least 20 minutes, the system shall show a focus chip at
+  the left end of the main terminal tab strip with that time in whole minutes.
+- While the elapsed focus time is under 20 minutes, the system shall show no chip
+  at all — no progress is displayed before a break is due.
+- The system shall refresh the chip at most every 30 seconds (no seconds ticking).
 - While `phase` is `break`, the system shall show the chip as a break with the
   time remaining until `breakEndsAt`.
 - If the file is missing, unreadable, older than 3 minutes, or `phase` is `idle`,
   then the system shall hide the chip and never nudge.
-- When the elapsed focus time reaches 20 minutes, the system shall show the chip
-  in an amber "break due" style.
+- The system shall show the focus chip in an amber "break due" style.
 - While the elapsed focus time is at least 20 minutes and the busy-strip rule
   holds, the system shall nudge once: the chip pulses and one desktop notification
   offers **Break** and **Later**.
@@ -93,7 +95,7 @@ whether anyone is waiting. Neither can decide alone.
   parse defensively, push `{phase, focusElapsedSec, breakEndsAt, updatedAt}` to the
   renderer over IPC; expose `focusBreakNow()` that writes `.focus-command.json`
   atomically (tmp + rename).
-- Renderer: the chip is the strip's first element; a 1 s tick derives elapsed time.
+- Renderer: the chip is the strip's first element; a 30 s tick derives elapsed time.
   The busy rule is a pure function of (tabs in shared order, status map,
   orchestrator set, hibernation records, now) — unit-test it.
 - The nudge notification goes through the main process like other actionable
