@@ -66,7 +66,12 @@ install.
   show the loading bar and re-run the report in place without leaving the page
   (keeping the current content visible until the new one arrives).
 - If a background refresh fails, then the page shall keep the previous content and
-  show the failure (exit status) in the top bar.
+  show the failure in the top bar: the exit status plus the last line of the script's
+  stderr, with the stderr tail (last few lines) on hover — so a failure is diagnosable
+  without re-running the script by hand.
+- When a report run fails, the app shall write one line to its log naming the report,
+  the exit status and the stderr tail, and `GET /` shall show that last error under the
+  report.
 - While a run of a report is in flight, a concurrent request for the same report
   shall wait for and share that run's result rather than start a second one.
 - If the script exits non-zero, times out (60 s) or the entry is invalid, then the app
