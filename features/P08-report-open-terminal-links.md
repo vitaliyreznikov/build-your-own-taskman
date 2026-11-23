@@ -65,6 +65,13 @@ but it must not be triggerable by any other web page.
   is `http://127.0.0.1:<port>` or `http://localhost:<port>`, `Sec-Fetch-Site` is
   `same-origin` (when sent), the body is `application/json`, and it carries the
   per-boot web token the app embedded in the page's top bar. Anything else → 403.
+- When a report page opened before the app restarted sends a `/web/open` (or P09
+  `/web/action`) with the previous boot's token and gets 403, the top bar shall fetch
+  the current token from `GET /web/token` and retry that request once, so the click
+  still works without the user reloading the page. A second 403 shall show the error.
+- The app shall serve `GET /web/token` only under the same loopback-`Host`,
+  `Sec-Fetch-Site: same-origin` and custom-header (`X-Taskman-Web-Refresh`) checks, so
+  no other site can read the token.
 - The top bar shall show "opened <task> › <subgoal>" on success and the error text on
   failure.
 
@@ -82,5 +89,9 @@ but it must not be triggerable by any other web page.
   A new tab is appended first and then moved; do it right after the open, in the same
   renderer exec, so no frame shows it at the end. Mark the request (e.g. `toFront: true`)
   in the web handler only, so other P02 callers are unaffected.
+- The per-boot token makes every open report tab stale after an app restart. A token
+  refresh endpoint plus one retry fixes that without weakening the gate: a cross-origin
+  `fetch` can't read the response (no CORS headers), and the custom header forces a
+  preflight that the server never answers.
 - Bring the window forward with restore-if-minimized + `show()` + `focus()` (macOS:
   `app.focus({ steal: true })`).
