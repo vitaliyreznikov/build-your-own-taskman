@@ -35,10 +35,20 @@ and exits.
   `configDir` from the status file), else the terminal's remembered account,
   else the default. Peer discovery is per account — a helper on the wrong account
   sees no peers.
-- **Fallback:** if there is no agent running in the terminal (just a shell), the
-  helper reports `FAIL`, times out, or exits non-zero, the app shows the
-  notification it used to show — titled so it's clear the trigger was **not**
-  delivered, with the session and the reason. A successful delivery also shows a quiet
+- **No agent there → start one, don't drop the trigger.** If the terminal is
+  asleep (F23) it is woken first. If it is only a shell with no hibernation
+  record (the agent exited, or the record was lost in a restart/restore), the
+  app wakes it anyway: it resumes the terminal's last known conversation
+  (`claude --resume <id>`, id from the status file or the F14 snapshot of that
+  terminal) and then delivers; with no usable id it starts a fresh agent whose
+  first prompt is the usual work-on-task / work-on-subgoal prompt followed by the
+  trigger. It never types into a pane whose foreground program is not a plain
+  shell (an editor, a running command).
+- **Fallback:** only when the trigger still can't be handed to an agent — the
+  pane is busy with another program, the agent never comes up, the helper
+  reports `FAIL`, times out, or exits non-zero — the app shows the notification
+  it used to show, titled so it's clear the trigger was **not** delivered, with
+  the session and the reason. A successful delivery also shows a quiet
   notification ("delivered to I665's session") so the human knows the agent was
   woken.
 
@@ -101,10 +111,30 @@ tells you something".
   conversation, exactly as viewing the tab would — wait until its agent is up,
   and then deliver; the trigger shall not be lost or turned into a notification
   only because its terminal was asleep.
-- If the chosen terminal is neither hibernated nor running an agent (the agent
-  exited and only the shell is left), then the system shall not start a helper
-  and shall fall back to the notification with the reason "no agent running in
-  <session>".
+- If the chosen terminal is neither hibernated nor running an agent and its
+  foreground program is a plain shell, then the system shall start an agent in
+  it before delivering: resume the terminal's own last known conversation (the
+  status file's id for that terminal, else the F14 snapshot's id for that
+  terminal — never another terminal's or the task's newest) when that
+  conversation's transcript exists, wait until the agent is up and deliver; and
+  otherwise start a fresh agent whose first prompt is the work-on-task /
+  work-on-subgoal launch prompt followed by the delivered message.
+- If a resumed conversation's agent does not come up, then the system shall
+  start a fresh agent with the launch prompt and the delivered message instead.
+- If the chosen terminal's foreground program is neither an agent nor a plain
+  shell, then the system shall not type into it and shall fall back to the
+  notification with the reason naming that program.
+- When the system types an agent command into a terminal (a wake, a resume, a
+  fresh start), it shall type the agent CLI's absolute path, so a shell whose
+  PATH lacks the CLI's directory still starts it.
+- If several peer sessions carry the target's terminal name, then the helper
+  shall send to one of them — the most recently started — and treat that as a
+  delivery, not a failure; if that one is unreachable it shall try the next.
+- While a delivery to a session is in flight (from choosing the session to the
+  helper's result), the system shall not hibernate that session (F23).
+- If the helper finds no peer for the target and the target meanwhile lost its
+  agent (it was put to sleep or exited), then the system shall make sure an
+  agent is there again (wake / resume / fresh start, as above) and retry once.
 - When a scheduled autorun fire is delivered into a live session (or falls back
   to the notification), the system shall still apply that fire's record change
   exactly as a launch would — `once` disarms, `cron` advances, `each` marks the
@@ -161,6 +191,31 @@ tells you something".
   give it a few seconds to register as a peer, then send; if the helper still
   finds no peer, wait and retry once. Waking happens only for a trigger that is
   actually delivered — never to "check" a session.
+- **Only a shell is the common case, not an edge.** In one week of logs 11 of
+  ~100 live PR deliveries, plus a run of morning cron autoruns, failed with "no
+  agent running (only a shell)": the agent had exited, or the terminal came back
+  from a restart/restore without a hibernation record. Treat it like sleep:
+  find the terminal's own last conversation id (status file → F14 snapshot entry
+  for *that* terminal name; the task-wide history is ambiguous across a task's
+  tabs), check its transcript exists under the account's `projects/`, type the
+  resume, wait for the agent, deliver. No id or no transcript → type a fresh
+  agent with the launch prompt + `[TaskMan] <header>` message as its first
+  prompt (no helper needed — the prompt *is* the delivery). Check the pane's
+  foreground command first: only `zsh`/`bash`/`sh`/`fish` (login `-zsh` too)
+  counts as "only a shell".
+- **Type the absolute CLI path.** Terminals restored long ago can carry a shell
+  whose PATH lacks `~/.local/bin`; a typed `claude --resume <id>` then prints
+  `command not found: claude` and the wake times out (observed: four morning
+  autoruns). Type the same absolute path the helper is spawned with.
+- **Race with F23.** A delivery can take a minute; F23's sweep can `/exit` the
+  target in the middle of it (observed: an alert-driven task idle for hours was
+  put to sleep between the readiness check and the helper's ListAgents, every
+  ten minutes). Hold the session against hibernation for the whole delivery, and
+  on a no-peer result re-check readiness and retry once.
+- **Duplicate peer names.** Two peers can report the same tmux name (a stale
+  registration next to the live one). Refusing as "ambiguous" lost the trigger;
+  the helper sends to the most recently started one and, if it is unreachable,
+  to the other.
 - **Choosing among a task's sessions.** The lookup returns each live session with
   its kind (task's own / subgoal); a pure chooser picks task-own first for a
   task-level trigger. Ordering by "most recently active" across both kinds is

@@ -94,6 +94,14 @@ user's place; hibernating frees the memory and keeps both.
   cause one more sweep after it; a burst of changes shall cause one sweep.
   *(Amended 2026-11-18: the only ways to sweep now were the tab-bar button and
   waiting up to 10 minutes, and a monitor-triggered agent could do neither.)*
+- The system shall type the wake (`<agent CLI> --resume <id>`) with the agent
+  CLI's absolute path, not the bare command name. *(Amended 2026-11-23: shells
+  restored long ago may lack the CLI's directory on PATH; the bare command
+  printed "command not found" and every L03 wake of such a terminal timed out.)*
+- The system shall not hibernate a terminal while an L03 delivery into it is in
+  flight. *(Amended 2026-11-23: a sweep put an alert-driven task's terminal to
+  sleep between L03's readiness check and its helper's peer lookup, so the
+  delivery found no peer — repeatedly.)*
 
 ## Build notes
 - **Idle signal:** tmux's `#{session_activity}` (epoch seconds of the last pane
