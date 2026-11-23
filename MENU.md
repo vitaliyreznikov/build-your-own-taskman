@@ -172,7 +172,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **P05** `rebind-terminal` command (a worker re-labels its tab onto a different existing task; overlay, not rename) — M — requires P01, P02, H08, F09 — [spec](features/P05-rebind-terminal-command.md)
 - [ ] **P06** Control CLI always reachable (`taskman` on PATH in app terminals + unconditional, zero-install invocation) — S — requires P01, P02 — [spec](features/P06-control-cli-always-reachable.md)
 - [ ] **P07** Local web reports (script-backed HTML pages on the app's loopback server, recomputed on every F5) — M — requires P01 — [spec](features/P07-local-web-reports.md)
-- [ ] **P08** Report → terminal links (click a task/subgoal in a web report to focus its terminal or start it) — S — requires P07, P02 — [spec](features/P08-report-open-terminal-links.md)
+- [ ] **P08** Report → terminal links (click a task/subgoal in a web report to focus its terminal or start it, and move its tab to first) — S — requires P07, P02, F07 — [spec](features/P08-report-open-terminal-links.md)
 - [ ] **P09** Report actions (buttons in a web report run the report's declared action script, then refresh) — S — requires P07, P08 — [spec](features/P09-report-actions.md)
 - [ ] **P10** `create-task --run` + worker brief (file a task and start its worker in one approved call; `run --prompt` briefs an existing worker) — M — requires P02, P03, P04, L03, J02, O02 — [spec](features/P10-create-and-run-with-brief.md)
 - [ ] **P11** Report cache max-age (per-report `maxAgeSec`: opening a report whose last result is fresh serves the cache without running the script; Reload forces a run) — S — requires P07, P09 — [spec](features/P11-report-cache-max-age.md)
