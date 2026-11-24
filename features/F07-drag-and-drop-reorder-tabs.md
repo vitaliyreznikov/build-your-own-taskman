@@ -35,19 +35,26 @@ menu also jumps it straight to either end.
 - While dragging, the system shall give a visual indication of the drop position.
 - The tab's right-click menu shall offer **⇤ Move to first** and **Move to last ⇥**.
   When the user picks one, the system shall move that tab to the start / end of
-  the strip as it is currently shown, exactly as if it had been dragged there.
-- The system shall omit **Move to first** on the tab that is already first and
-  **Move to last** on the tab that is already last.
-- Where a task panel shows its own terminal strip, the same two items shall move
-  the tab to the first / last position among that task's tabs.
+  the app's tab order (the one shared order of F27, where built), so it shows first / last in **every**
+  strip that holds it — not only the strip the menu was opened in.
+- The system shall omit **Move to first** only on the tab that is already first
+  in the shared order, and **Move to last** only on the tab already last in it —
+  never because the tab happens to be first / last (or alone) in a filtered
+  strip. A task panel's strip with a single tab therefore still offers both
+  whenever other terminals are open elsewhere.
+- Where intake tabs (F26) exist and lead the order, **Move to first** on any other
+  tab shall place it right after them, so intake tabs keep the left end; on an
+  intake tab it shall move to the very start.
 
 ## Build notes
 - Reorder is a pure view-order concern — it must not rename or restart any
   session, so `TASKS_TERM_ID` and status keying (F05, H-epic) stay stable across
   a drag.
-- "First / last" is measured in the strip the user is looking at (after any
-  filter hides tabs): the move is a reorder onto the first / last *visible* tab,
-  so hidden tabs keep their relative places. A divider anchored to the moved tab
-  travels with it, as in a drag.
+- "First / last" is measured in the shared order, not in the strip the user is
+  looking at: the move is a reorder onto the shared order's first (non-intake) /
+  last tab. Every other tab, hidden or shown, keeps its relative place. A divider
+  anchored to the moved tab travels with it, as in a drag. (Measuring against the
+  visible strip hid the item on a tab that was alone in a task panel, leaving no
+  way to bring that terminal to the front of the other strips.)
 - Reuse the board's existing drag-and-drop machinery if present rather than
   adding a second DnD library.

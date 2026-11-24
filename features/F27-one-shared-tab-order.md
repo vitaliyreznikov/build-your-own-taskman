@@ -41,6 +41,9 @@ last, which F07 already provides — and the one-step items were removed.)
   (F14).
 - When a task's card jumps to "its" terminal, the system shall prefer the task's
   own terminal over a subgoal terminal that happens to sit further left.
+- When the user picks F07 **Move to first / last** in any strip, the system shall
+  move the tab to the start / end of the shared order, and shall decide whether
+  to offer each item from the shared order, not from the strip's filtered tabs.
 - The tab right-click menu shall not offer one-step **Move left / Move right**
   items; F07's **Move to first / last** are the menu's reorder actions.
 
@@ -50,5 +53,7 @@ last, which F07 already provides — and the one-step items were removed.)
   sort it. A view that used to sort (task terminals first, then subgoal
   terminals, each by index) keeps that only as the order new tabs happen to be
   appended in.
-- F07's Move to first / last reorder onto the first / last *visible* tab, so tabs
-  hidden by a filter keep their places relative to each other.
+- F07's Move to first / last reorder onto the first / last tab of the shared
+  order (after any leading intake tabs, F26), and are offered or omitted by the
+  tab's position there — so they work the same from a filtered strip or a task
+  panel holding a single tab, and the moved tab leads / trails every strip.
