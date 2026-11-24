@@ -59,8 +59,8 @@ visible: when nobody waits for you, a few minutes away costs zero throughput.
 The focus timer already knows how long the user has been working; TaskMan knows
 whether anyone is waiting. Neither can decide alone.
 
-> *"After 20 min of work, TaskMan shows a timer; when the 5 leftmost terminals are (the threshold was later moved to 25 min)
-> all busy — nobody waits for me — it proposes a short break."*
+> *"After 20 min of work, TaskMan shows a timer; when the 5 leftmost terminals are
+> all busy — nobody waits for me — it proposes a short break."* (Threshold later moved to 25 min.)
 
 ## Acceptance criteria (EARS)
 - While `.focus-state.json` exists, has `updatedAt` within the last 3 minutes,
