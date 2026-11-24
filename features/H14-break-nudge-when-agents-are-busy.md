@@ -11,7 +11,7 @@ novel: true
 An external focus timer (any Pomodoro-style app the user already runs) publishes
 its state to a small local file. TaskMan shows the time since the last break as a
 **focus chip at the left end of the terminal tab strip**, and once the user has
-been focusing for 20 minutes it suggests a **short break at the moment the break
+been focusing for 25 minutes it suggests a **short break at the moment the break
 costs nothing**: when every agent near the front of the strip is either working or
 parked on something external, so none of them is waiting for the user.
 
@@ -59,15 +59,15 @@ visible: when nobody waits for you, a few minutes away costs zero throughput.
 The focus timer already knows how long the user has been working; TaskMan knows
 whether anyone is waiting. Neither can decide alone.
 
-> *"After 20 min of work, TaskMan shows a timer; when the 5 leftmost terminals are
+> *"After 20 min of work, TaskMan shows a timer; when the 5 leftmost terminals are (the threshold was later moved to 25 min)
 > all busy — nobody waits for me — it proposes a short break."*
 
 ## Acceptance criteria (EARS)
 - While `.focus-state.json` exists, has `updatedAt` within the last 3 minutes,
   `phase` is `focusing` and the elapsed focus time (`focusElapsedSec` plus the time
-  since `updatedAt`) is at least 20 minutes, the system shall show a focus chip at
+  since `updatedAt`) is at least 25 minutes, the system shall show a focus chip at
   the left end of the main terminal tab strip with that time in whole minutes.
-- While the elapsed focus time is under 20 minutes, the system shall show no chip
+- While the elapsed focus time is under 25 minutes, the system shall show no chip
   at all — no progress is displayed before a break is due.
 - The system shall refresh the chip at most every 30 seconds (no seconds ticking).
 - While `phase` is `break`, the system shall show the chip as a break with the
@@ -75,7 +75,7 @@ whether anyone is waiting. Neither can decide alone.
 - If the file is missing, unreadable, older than 3 minutes, or `phase` is `idle`,
   then the system shall hide the chip and never nudge.
 - The system shall show the focus chip in an amber "break due" style.
-- While the elapsed focus time is at least 20 minutes and the busy-strip rule
+- While the elapsed focus time is at least 25 minutes and the busy-strip rule
   holds, the system shall nudge: the chip pulses, a desktop notification offers
   **Break** and **Later**, and the system writes `.focus-command.json` with
   `cmd: "prompt"` and a fresh `id` so the focus timer raises its own break prompt.
@@ -85,7 +85,7 @@ whether anyone is waiting. Neither can decide alone.
   recommended"), silently after the first post, whether or not the busy rule
   still holds, until the user acts on it or the cycle ends.
 - The system shall start at most one nudge per focus cycle; a cycle ends when the
-  elapsed time drops below 20 minutes (the timer reset it or a break started), and
+  elapsed time drops below 25 minutes (the timer reset it or a break started), and
   then the system shall remove the notification.
 - When the user picks **Later**, the system shall nudge again no earlier than 10
   minutes later, under the same rule.
