@@ -8,9 +8,10 @@ novel: true
 ---
 
 ## What
-A **notification panel on the right edge of the window**. Collapsed, it is a
-narrow vertical tab with a 🔔 and a count; expanded, it is a sidebar listing
-notifications, newest first. Each notification has an icon, a one-line title, a
+A **notification panel on the right edge of the window**. Hidden, it takes no
+space at all: a **"🔔 Notifications N" row in the left sidebar** (next to Today)
+shows the count and opens it, and that row is absent while there is nothing to
+show. Shown, it is a sidebar on the right listing notifications, newest first. Each notification has an icon, a one-line title, a
 short detail line, the time it was added, its action button(s) and an **×** that
 dismisses it. The header has **Clear all** and a button that hides the panel
 again.
@@ -60,16 +61,18 @@ what is due — the panel turns their *transitions* into an inbox.
 > takes me to it. Task entered Today → removed automatically once it leaves."*
 
 ## Acceptance criteria (EARS)
-- The system shall show the notification panel at the right edge of the main
-  window, either **collapsed** (a narrow vertical tab with 🔔 and the number of
-  current notifications) or **expanded** (a sidebar listing them).
-- When the user clicks the collapsed tab, the system shall expand the panel; when
-  the user clicks the panel's hide button, the system shall collapse it.
-- The system shall remember whether the panel is expanded across restarts
+- While the panel is hidden, the system shall take no space for it at the right
+  edge of the window (no tab, strip or column).
+- While there is at least one notification, the system shall show a
+  "🔔 Notifications" row in the left sidebar with the count as a badge; while
+  there are none, it shall not show the row.
+- When the user clicks the sidebar row, the system shall show the panel as a
+  sidebar at the right edge; when the user clicks the row again or the panel's
+  hide button, the system shall hide it.
+- While the panel is shown and the last notification goes away, the system shall
+  keep it shown with an empty-state line until the user hides it.
+- The system shall remember whether the panel is shown across restarts
   (machine-local view state).
-- While there is at least one notification, the system shall show its count as a
-  badge on the collapsed tab; while there are none, it shall show the tab without
-  a count.
 - The system shall list notifications newest first, each with an icon, a title, a
   detail line, the time it was added, its action buttons and an × button.
 - When the user clicks × on a notification, the system shall remove it and shall
@@ -114,7 +117,11 @@ what is due — the panel turns their *transitions* into an inbox.
   machine-local view storage (like stars and tab order). No history of past
   notifications: once removed or dismissed, it's gone. Dismissed keys are pruned
   as soon as their condition stops holding, so the store stays small.
-- **Badge:** the collapsed tab shows the total count of current notifications
+- **Hidden state:** a sidebar row, present only while there are notifications
+  (an earlier always-present 28 px right-edge tab wasted a whole column of
+  terminal width for one icon). The open panel stays docked (it narrows the
+  content), not an overlay.
+- **Badge:** the sidebar row shows the total count of current notifications
   (there is no unread/read distinction — the list *is* the to-do set, and every
   entry auto-clears when handled).
 - **Attention auto-clear:** yes. A starred-terminal notification is removed as
@@ -146,5 +153,7 @@ what is due — the panel turns their *transitions* into an inbox.
   sources to `reconcile`, and leave the other kinds' items untouched.
 - Renderer only; no IPC, no files. Persist with `localStorage` under one key;
   wrap reads/writes in try/catch.
-- Layout: the panel is the rightmost grid column, after the task side panel; the
-  collapsed tab is ~28 px wide so it never covers the terminal or board.
+- Layout: the panel is the rightmost grid column, after the task side panel; while
+  hidden it renders nothing there (the reconciler still runs). The shown/hidden
+  flag and the count live in the app store so the sidebar row can read and
+  toggle them.
