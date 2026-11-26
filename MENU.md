@@ -69,6 +69,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **E01** P0 NextAction desktop notification — M — requires B10
 - [ ] **E02** Notification auto-clear (on DONE/CLOSED / priority drop / reschedule) — S — requires E01
 - [ ] **E03** Long-delay timer handling (>24-day NextAction) — S — requires E01
+- [ ] **E04** In-app notification panel (hideable right sidebar; ★ terminal needs you → jump, task entered Today → auto-clears; × dismiss) — M — requires E01, F22, H08, H09, Q02, Q05, Q08 — [spec](features/E04-in-app-notification-panel.md)
 
 ## Epic F — In-app terminals  · the pivotal enabler
 
