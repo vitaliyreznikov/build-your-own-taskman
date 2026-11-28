@@ -47,13 +47,17 @@ research, and route the work.
    `intake/<category>.md` (or `intake/common.md` for a change meant for every
    category) and records the edit in its session file. It doesn't edit the prompt
    on its own initiative.
-8. **A finished intake gets out of the way.** When the intake agent ends a turn
-   with `✅ done` (hand-off made, session file written), its tab is marked
-   finished at once (dimmed, ✓), and **2 minutes later the tab closes itself**
-   (the tmux session is killed). Any sign of life in between cancels the close:
-   the agent goes back to `working`/`attention`/`waiting`, or the user types in
-   that terminal. A `waiting` or `attention` intake is never closed
-   automatically.
+8. **A finished intake gets out of the way — only after a hand-off.** An intake
+   has *handed off* once a control-API request made from that terminal
+   (`taskman create-task`, `create-task --run`, or `run`) has been approved and
+   completed. When a handed-off intake ends a turn with `✅ done`, its tab is
+   marked finished at once (dimmed, ✓), and **15 minutes later the tab closes
+   itself** (the tmux session is killed). An intake that only answered a
+   question — no task filed, no worker launched — is **never** closed
+   automatically, however long it sits at `done`: the user may still be reading
+   the answer. Any sign of life in between cancels the close: the agent goes
+   back to `working`/`attention`/`waiting`, or the user types in that terminal.
+   A `waiting` or `attention` intake is never closed automatically.
 
 ## Why it exists
 F13 made "+" file a task before anyone knew what the work was. In practice "+"
@@ -68,6 +72,13 @@ per-category, and because it's a plain file, the user can teach it in plain
 words. The session files give the intake continuity ("same thing as yesterday's
 request") without a database. Handing off to a task worker instead of working in
 place keeps every task's work on its own terminal, card and timeline.
+
+Auto-close exists so a routed request doesn't leave a dead tab behind, but an
+earlier version (any `done` → close after 2 min) also closed intakes that had
+simply answered a question, while the user was still reading the answer. The
+hand-off is therefore read from what the app itself executed (the control-API
+audit), not from the agent's wording, and the delay is long enough to read the
+last reply.
 
 ## Acceptance criteria (EARS)
 - When the user confirms a category in the Terminal-strip "+" picker, the system
@@ -98,13 +109,23 @@ place keeps every task's work on its own terminal, card and timeline.
   additional terminal for that task (or subgoal, with `--goal`) even if one is
   already open; without `--new` the existing focus-or-open behavior shall be
   unchanged.
-- When an intake terminal's agent status becomes `done`, the system shall mark
-  that tab as finished (visually distinct from live tabs) immediately.
-- While an intake terminal stays `done` with no keyboard input from the user,
-  the system shall close the tab and end its terminal session 2 minutes after
-  the status became `done`.
+- The system shall consider an intake terminal *handed off* once a
+  `create-task`, `create-and-run` or `open-terminal` (`taskman run`) control-API
+  request whose source is that terminal has been approved and completed
+  successfully; a denied, timed-out or failed request shall not count.
+- The system shall determine the hand-off from its own record of executed
+  requests, and shall keep knowing it across an app restart for as long as the
+  terminal stays open.
+- When a handed-off intake terminal's agent status becomes `done` (or an intake
+  that is already `done` becomes handed off), the system shall mark that tab as
+  finished (visually distinct from live tabs) immediately.
+- While a handed-off intake terminal stays `done` with no keyboard input from
+  the user, the system shall close the tab and end its terminal session 15
+  minutes after it was marked finished.
+- While an intake terminal has not handed off, the system shall neither mark it
+  finished nor close it automatically, whatever its status and for however long.
 - If the intake's status changes away from `done`, or the user types into that
-  terminal, before the 2 minutes elapse, the system shall cancel the pending
+  terminal, before the 15 minutes elapse, the system shall cancel the pending
   close and remove the finished mark.
 - The system shall never auto-close an intake whose status is `waiting` or
   `attention`, nor any non-intake terminal.
@@ -133,11 +154,20 @@ place keeps every task's work on its own terminal, card and timeline.
 - The session-file stamp is minute-resolution. If two intakes start in the same
   minute, add a `-2` suffix rather than overwriting.
 - Auto-close lives in the renderer: watch the per-terminal status (H08) for
-  `intake-*` tabs, start a 2-minute timer on `done`, and close the tab through
-  the normal close path (the F10 "agent is running" guard doesn't apply; the
-  agent is idle at its prompt). Any status change or terminal
-  input cancels the timer and drops the mark; a later fresh `done` starts a new
-  2 minutes. Timers don't survive an app restart: on startup, an intake
-  that is already `done` gets a fresh 2 minutes.
+  `intake-*` tabs and start a 15-minute timer on `done` — but only for a tab in
+  the *handed-off* set — then close the tab through the normal close path (the
+  F10 "agent is running" guard doesn't apply; the agent is idle at its prompt).
+  Any status change or terminal input cancels the timer and drops the mark; a
+  later fresh `done` starts a new 15 minutes. Timers don't survive an app
+  restart: on startup, a handed-off intake that is already `done` gets a fresh
+  15 minutes.
+- The handed-off set comes from main, which owns the control API: when a
+  request finishes `done`, main pushes its `source.termId` to the renderer if
+  the action is a hand-off verb and the terminal is an intake. At startup main
+  rebuilds the set from the append-only request audit (`.api-requests.jsonl`):
+  the `created` line carries `source.termId`, the `done` line the outcome, so
+  join them on `requestId`. Keep that join a pure function so it's testable.
+  Don't infer the hand-off from the answer text; the agent may phrase it any way.
+- The delay constant lives in one place (shared with the tests).
 - The F13 create-task prompt can stay in code for a direct "new task + agent"
   path, but "+" no longer uses it.
