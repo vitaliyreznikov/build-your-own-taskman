@@ -69,7 +69,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **E01** P0 NextAction desktop notification — M — requires B10
 - [ ] **E02** Notification auto-clear (on DONE/CLOSED / priority drop / reschedule) — S — requires E01
 - [ ] **E03** Long-delay timer handling (>24-day NextAction) — S — requires E01
-- [ ] **E04** In-app notification panel (right sidebar, opened from a sidebar row that shows only while there are notifications; ★ terminal needs you → jump, task entered Today → auto-clears; × dismiss) — M — requires E01, F22, H08, H09, Q02, Q05, Q08 — [spec](features/E04-in-app-notification-panel.md)
+- [ ] **E04** In-app notification panel (right sidebar, opened from a sidebar row that shows only while there are notifications; ★ terminal needs you → jump, Today row is due → auto-clears; × dismiss) — M — requires E01, F22, H08, H09, Q02, Q05, Q08 — [spec](features/E04-in-app-notification-panel.md)
 
 ## Epic F — In-app terminals  · the pivotal enabler
 
@@ -186,7 +186,7 @@ L(arge). ⭐ = one of the two novel ideas. Each row links its feature spec.
 - [ ] **Q01** Start and Due times (rename NextAction → Start, add Due; Start ≤ Due) — M — requires A02, B02, B10 — [spec](features/Q01-start-and-due-times.md)
 - [ ] **Q02** Today view (every task with a Due, grouped by time; Done / Snooze / Skip) — M — requires Q01, B06 — [spec](features/Q02-today-view.md)
 - [ ] **Q03** Repeating time-bound tasks (`Repeat` cron, ✓/✕ step one occurrence at a time, no auto-missed, `due-log.jsonl`, `each` autorun per occurrence) — M — requires Q01, Q02 — [spec](features/Q03-repeating-tasks.md)
-- [ ] **Q04** Due notifications (at Start and on overdue, any priority; Done / Snooze actions) — S — requires Q01, Q02, E01, E03 — [spec](features/Q04-due-notifications.md)
+- [ ] **Q04** Due notifications (on overdue / no-window repeat "Now", any priority, none while the Due is ahead; Done / Snooze actions) — S — requires Q01, Q02, E01, E03 — [spec](features/Q04-due-notifications.md)
 - [ ] **Q05** Subgoal Due (v2 subgoals with a deadline in Today; ✓ / snooze, badge, overdue notification) — M — requires Q02, Q04, O03, O15 — [spec](features/Q05-subgoal-due.md)
 - [ ] **Q06** Today ★ marker (a row whose task/subgoal has a starred open terminal shows ★ = in progress) — S — requires Q02, Q05, F22, O09 — [spec](features/Q06-today-starred-marker.md)
 - [ ] **Q07** `each` autorun catch-up (a stale occurrence of an `each` task is auto-skipped when the next one starts, so the agent keeps launching) — S — requires Q03, K01 — [spec](features/Q07-each-autorun-catch-up.md)

@@ -1,7 +1,7 @@
 ---
 id: E04
 epic: E — Native notifications
-title: In-app notification panel (hideable right sidebar; starred terminal needs you → jump; task entered Today → auto-clears)
+title: In-app notification panel (hideable right sidebar; starred terminal needs you → jump; Today row is due → auto-clears)
 size: M
 requires: [E01, F22, H08, H09, Q02, Q05, Q08]
 novel: true
@@ -36,15 +36,16 @@ Two sources to start:
    condition is suspended while that terminal is the one on screen (terminal view
    active, that tab selected): looking at it handles it, so the notification
    clears, and it comes back if the user leaves without answering.
-2. **A task entered Today.** A row of the Today view (Q02) — a task occurrence, a
+2. **A Today row is due.** A row of the Today view (Q02) — a task occurrence, a
    held (snoozed) occurrence of a repeating task (Q03), or a subgoal with a due
-   (Q05) — whose Due falls **before the end of the current local day** (Today's
-   *Overdue* and *Today* groups) and that the Today priority filter (Q08) shows.
+   (Q05) — whose Due **has arrived** (Due ≤ now: overdue, or a no-window repeat at
+   its time) and that the Today priority filter (Q08) shows. A row whose Due is
+   still ahead — even later today — is not a notification; it is in Today.
    Key: `today:<task id>` for a one-off task, `today:<task id>@<occurrence key>`
    for an occurrence of a repeating task, `today:<task id>#<subgoal id>` for a
    subgoal. Action: **Open** — opens the task (its panel) on the board. Done,
-   snooze past midnight, moving it to DONE/CLOSED, clearing its Due, or a filter
-   change that hides it all take it out of Today and so remove the notification.
+   snooze (the Due moves into the future), moving it to DONE/CLOSED, clearing its
+   Due, or a filter change that hides it all remove the notification.
 
 ## Why it exists
 Desktop notifications (E01, H07, Q04) are fire-and-forget: missed while away from
@@ -88,21 +89,22 @@ what is due — the panel turns their *transitions* into an inbox.
 - When a terminal's notification condition stops holding (status changes, the
   terminal is shown, unstarred, hibernated or closed), the system shall remove
   its notification without user action.
-- While a Today row (task occurrence, held occurrence or subgoal due) is due
-  before the end of the current local day and passes the Today priority filter,
-  the system shall keep one notification for it, titled with the task id and
-  title (and the subgoal title for a subgoal row) and detailed with its Due
-  ("overdue since 09:00" / "due 18:00").
+- While a Today row (task occurrence, held occurrence or subgoal due) has a Due
+  at or before now and passes the Today priority filter, the system shall keep
+  one notification for it, titled with the task id and title (and the subgoal
+  title for a subgoal row) and detailed with its Due ("overdue since 09:00").
+- While a Today row's Due is in the future, the system shall not show a
+  notification for it, even when the Due is later the same day.
 - When the user clicks **Open** on a Today notification, the system shall open
   that task on the board.
-- When a Today row leaves that set (done, skipped, snoozed past today, moved to
+- When a Today row leaves that set (done, skipped, snoozed into the future, moved to
   DONE/CLOSED, Due cleared, hidden by the filter), the system shall remove its
   notification without user action.
 - When a condition stops holding, the system shall forget a dismissal of its key,
   so that the condition holding again later adds a new notification.
 - The system shall re-evaluate every source whenever the task snapshot, the agent
   status map, the terminal list, the star set or the Today filter changes, and at
-  least once a minute (Today rows cross midnight and become due by time alone).
+  least once a minute (Today rows become due by time alone).
 - The system shall not reconcile a source until that source's data has loaded
   after launch, so a restart never clears persisted notifications or
   dismissals while the data is still empty.
@@ -129,11 +131,13 @@ what is due — the panel turns their *transitions* into an inbox.
   handling it — and also while the user is looking at that terminal.
 - **`approval` counts as needing you**, alongside `attention` (both are "the agent
   is blocked on the user"; see H12).
-- **"Entered Today" means due by the end of today** (Overdue + Today groups), not
-  every row with any future Due — otherwise a task due next month would sit in
-  the inbox for weeks. A one-off task snoozed to later the same day keeps its
-  notification (its key is the task id); a repeating task's next occurrence is a
-  new notification.
+- **"Due" means the Due has arrived**, not "due some time today". Until
+  2026-11-28 the source was every row due before the end of the day, which filled
+  the inbox each morning with "due 14:00 / due 17:00" cards for things that were
+  not yet late — noise, since Today already lists them. Snoozing a row moves its
+  Due into the future and so removes the card; when the new Due arrives the key
+  comes back and notifies again (its dismissal was forgotten when it left). A
+  repeating task's next occurrence is a new notification.
 - **First launch:** everything already in the set becomes a notification (there
   is no "baseline" suppression) — the inbox should reflect what needs you now.
 - **No ordering by priority**; newest first. The panel is not filtered by the

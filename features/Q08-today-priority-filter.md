@@ -38,7 +38,7 @@ toast says so, with **Undo** that restores the previous priority.
 
 The filter also governs what Today **counts and announces**:
 - the sidebar's overdue badge counts only rows the filter shows;
-- Due notifications (Q04 at Start / overdue, Q05 subgoal overdue, and the
+- Due notifications (Q04 overdue / "Now", Q05 subgoal overdue, and the
   launch summary) fire only for rows the filter shows. A row that went due while
   hidden does **not** fire later when the filter widens or its priority rises —
   it is already late, and the badge and the list show it.
@@ -87,7 +87,7 @@ the row becomes due (or starts) while visible.
 - When an in-row priority change takes a row out of the filter, the system shall
   show a toast with Undo, and Undo shall restore the previous priority.
 - The sidebar overdue badge shall count only overdue rows the filter shows.
-- The system shall send Due start/overdue notifications (Q04), subgoal overdue
+- The system shall send Due overdue / "Now" notifications (Q04), subgoal overdue
   notifications (Q05) and the launch summary only for rows the filter shows.
 - When the filter narrows or a task's priority drops out of it, the system shall
   close that row's open Due notification.
